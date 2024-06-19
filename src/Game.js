@@ -34,14 +34,18 @@ export default function Game() {
     };
 
     // Game
-    let [game, setGame] = useState(defaultGame);
+    let [game, setGame] = useState(structuredClone(defaultGame));
 
 
     function addPlayer() {
-        let modifiedPlayers = game.players.splice();
-        modifiedPlayers.push([{hidden:true}]);
-        console.log('modified: ', modifiedPlayers);
-        setGame({ ...game, players:modifiedPlayers});
+        // let modifiedPlayers = game.players.splice();
+        // modifiedPlayers.push([{hidden:true}]);
+        // console.log('modified: ', modifiedPlayers);
+        // setGame({ ...game, players:modifiedPlayers});
+        setGame(game => ({
+            ...game,
+            players:game.players.concat([])
+        }));
         console.log('game: ', game.players);
 
         // Give cards
