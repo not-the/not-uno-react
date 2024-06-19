@@ -1,22 +1,25 @@
-import Icon from "./Icon.js";
-import Card from "./Card.js";
+import { useState } from 'react'
+import Game from './Game.js'
 
 
-function App() {
+export default function App() {
+    let [menu, setMenu] = useState("game");
+
+
+    let page =
+        menu === "game" ? <Game /> :
+        <h1>Home</h1>
+
     return (
         <>
-            <h1>hello world</h1>
+            <nav>
+                <button onClick={() => setMenu("home")}>Home</button>
+                <button onClick={() => setMenu("game")}>Game</button>
+            </nav>
 
-            <Card data={{ "color": "red", "type": "reverse" }} />
-            <Card data={{ "color": "yellow", "type": "5" }} />
-            <Card data={{ "color": "green", "type": "5" }} />
-            <Card data={{ "color": "blue", "type": "5" }} />
-            <Card data={{ "color": "black", "type": "5" }} />
-
-
-
+            <main>
+                {page}
+            </main>
         </>
     );
 }
-
-export default App;
