@@ -2,9 +2,10 @@ import { cloneElement } from 'react';
 
 import Icon from "./Icon.js"
 
-export default function Card({ data=null, owner, user, game, onclick }) {
+export default function Card({ data=null, owner, user, game, rotation=0, onClick, style={} }) {
 
     // Empty
+    console.log(data);
     if(data === null) return (
         <div className="card empty"></div>
     )
@@ -12,7 +13,7 @@ export default function Card({ data=null, owner, user, game, onclick }) {
     // Card back
     let visible = (data.hidden || (owner !== user?.id));
     if(visible && !game?.xray) return (
-            <div className="card back" onClick={onclick} tabIndex="0" role="button">
+            <div className="card back" onClick={onClick} tabIndex="0" role="button">
                 <div className="oval"/>
                 <Icon icon="UNO" />
             </div>
@@ -36,6 +37,8 @@ export default function Card({ data=null, owner, user, game, onclick }) {
     if(visible && game?.xray) classes += ' xrayed';
     classes += ` ${data.type}`;
 
+    data.rotation ??= rotation;
+
     // Wild decorator
     let ovalInner;
     if(data.type === 'wild') {
@@ -52,8 +55,8 @@ export default function Card({ data=null, owner, user, game, onclick }) {
     }
     
     return (
-        <div className={classes} onClick={onclick} tabIndex="0" role="button" draggable="true"
-            style={{ "--card-color": `var(--${data.color})` }}
+        <div className={classes} onClick={onClick} tabIndex="0" role="button" draggable="true"
+            style={{ ...style, "transform": `rotate(${data.rotation}deg)`, "--card-color": `var(--${data.color})` }}
         >
             {/* Decorator */}
             <div className="oval">{ovalInner}</div>

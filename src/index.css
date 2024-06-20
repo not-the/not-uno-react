@@ -41,6 +41,17 @@ body {
 
 
 
+/* Pile */
+#pile {
+    position: relative;
+    height: 168px;
+}
+#pile > .card {
+    position: absolute;
+}
+
+
+
 /* Player */
 .player {
     display: flex;
@@ -73,7 +84,7 @@ body {
 
     user-select: none;
     cursor: pointer;
-    transition: 0.15s ease;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 .card.empty {
     background-color: rgba(0, 0, 0, 0.5);

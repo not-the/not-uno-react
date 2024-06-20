@@ -21,6 +21,7 @@ const defaultGame = {
     direction: 1, // 1 is clockwise
 
     // Dev tools
+    control_everyone: true,
     // xray: false,
     xray: true,
 }
@@ -36,27 +37,22 @@ export default function Game() {
     // Game
     let [game, setGame] = useState(structuredClone(defaultGame));
 
+    // Object to modify while setting up game
+    let setupGame = structuredClone(game);
 
-    function addPlayer() {
-        // let modifiedPlayers = game.players.splice();
-        // modifiedPlayers.push([{hidden:true}]);
-        // console.log('modified: ', modifiedPlayers);
-        // setGame({ ...game, players:modifiedPlayers});
-        setGame(game => ({
-            ...game,
-            players:game.players.concat([])
-        }));
-        console.log('game: ', game.players);
+    function addPlayer(prevGame) {
+        let modifiedGame = prevGame ?? structuredClone(game);
+        modifiedGame.dude = true;
+        modifiedGame.players.push([]);
+        setGame(modifiedGame);
 
         // Give cards
-        let PID = game.players.length-1;
-        repeat(() => moveCard("deck", PID, true), config.starting_cards);
+        let PID = modifiedGame.players.length-1;
+        repeat(() => moveCard("deck", PID, false, modifiedGame), config.starting_cards);
     }
 
-    function moveCard(fromName, toName, unhide) {
-        // if(toName === -1) return;
-
-        let modifiedGame = structuredClone(game);
+    function moveCard(fromName, toName, hidden, prevGame) {
+        let modifiedGame = prevGame ?? structuredClone(game);
 
         // Get to/from locations
         let from = typeof fromName === 'number' ?
@@ -66,18 +62,11 @@ export default function Game() {
             modifiedGame.players[toName] : // Player
             modifiedGame[toName]; // Location
 
-        console.log(toName);
-
-        // if(to === undefined) return;
-        console.log("/ -----------");
-        console.log(modifiedGame.players);
-        console.log("----------- /");
-
         // Take card
         let card = from.shift();
 
         if(card === undefined) return console.warn('Card is undefined'); // Error
-        if(unhide) card.hidden = false; // Unhide
+        if(hidden !== undefined) card.hidden = hidden; // Unhide
         to.push(card); // Move
 
         setGame(modifiedGame);
@@ -98,22 +87,46 @@ export default function Game() {
         return false;
     }
 
+    let started = false;
+
     // Setup
     useEffect(() => {
         console.log('started: ' + game.started);
-        if(!game.started) {
-            let modifiedGame = structuredClone(game);
+        if(!started) {
+            let modifiedGame = setupGame;
             for(let i in modifiedGame.deck) modifiedGame.deck[i].hidden = true;
             shuffle(modifiedGame.deck); // Shuffle
-            console.log(modifiedGame);
-            setGame({ ...modifiedGame, started:true });
+            started = true;
+            // setGame({ ...modifiedGame, started:true });
 
             // Add players
-            addPlayer(); // Player
-            addPlayer(); // Player
-            moveCard("deck", "pile"); // First card
+            addPlayer(modifiedGame); // Player
+            addPlayer(modifiedGame); // Player
+            moveCard("deck", "pile", false, modifiedGame); // First card
+
+            setGame(modifiedGame);
+
+            console.log('gaming');
         }
     }, [])
+
+
+
+    // Player functions
+    function drawCard() {
+        if(game.turn !== user.id) return console.warn(`[Player ${user.id}] Not your turn`);
+
+        moveCard("deck", user.id, false);
+    }
+
+    // Place card in pile and enact its effects
+    function playCard(PID, cardID) {
+        if(game.turn !== user.id) return console.warn(`[Player ${user.id}] Not your turn`);
+
+        console.log(game.players[PID][cardID]);
+
+        // if(testCards())
+    }
 
 
     // HTML
@@ -121,29 +134,37 @@ export default function Game() {
         <div id="game">
             {/* Debug */}
             <button onClick={() => addPlayer()}>ADD PLAYER</button>
+            <button onClick={() => moveCard("deck", "pile", false)}>Card from deck -&gt; pile</button>
 
-            <h1>Deck</h1>
+            <h1>Deck ({game.deck.length})</h1>
             {
-                <Card data={{ hidden:true }} onclick={() => moveCard("deck", "pile")} />
+                <Card data={game.deck[game.deck.length-1]} onClick={drawCard} />
             }
 
             <h1>Pile</h1>
+            <div id="pile">
             {
                 // game.pile.map((cardData, index) => {
-                //     return <Card data={cardData} key={index} />
+                //     return <Card data={cardData} key={index}
+                //         rotation={(Math.floor(Math.random() * 90)) - 45}
+                //     />
                 // })
 
                 <Card data={game.pile[game.pile.length-1]} />
             }
+            </div>
 
             <h1>Players</h1>
             {game.players.map((player, playerIndex) => {
                 return (
                     <>
-                        <h2>Player {playerIndex+1}</h2>
+                        <h2>Player {playerIndex+1}{playerIndex === user.id ? ' (YOU)' : null}</h2>
                         <div className="player" key={playerIndex}>
                             {game.players[playerIndex].map((cardData, cardIndex) => {
-                                return <Card data={cardData} key={cardIndex} owner={playerIndex} user={user} game={game} />
+                                return <Card data={cardData} key={cardIndex}
+                                    owner={playerIndex} user={user} game={game}
+                                    onClick={() => playCard(playerIndex, cardIndex)}
+                                />
                             })}
                         </div>
                     </>
