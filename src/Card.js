@@ -5,7 +5,6 @@ import Icon from "./Icon.js"
 export default function Card({ data=null, owner, user, game, rotation=0, onClick, style={} }) {
 
     // Empty
-    console.log(data);
     if(data === null) return (
         <div className="card empty"></div>
     )
@@ -15,22 +14,23 @@ export default function Card({ data=null, owner, user, game, rotation=0, onClick
     if(visible && !game?.xray) return (
             <div className="card back" onClick={onClick} tabIndex="0" role="button">
                 <div className="oval"/>
-                <Icon icon="UNO" />
+                <Icon icon="NOPE" />
             </div>
     )
 
 
     // Corner symbol
-    let cornerSymbol = data.type;
-    if(cornerSymbol === "draw2") cornerSymbol = <Icon icon="+2" className="corner_symbol" />;
-    else if(cornerSymbol === "draw4") cornerSymbol = <Icon icon="+4" className="corner_symbol" />;
-    else if(cornerSymbol === "wild") cornerSymbol = <Icon icon={data.type} className="corner_symbol" />;
+    // let cornerSymbol = data.type;
+    // if(cornerSymbol === "draw2") cornerSymbol = <Icon icon="+2" className="corner_symbol" />;
+    // else if(cornerSymbol === "draw4") cornerSymbol = <Icon icon="+4" className="corner_symbol" />;
+    // else if(cornerSymbol === "wild") cornerSymbol = <Icon icon={data.type} className="corner_symbol" />;
 
-    // Default
-    else cornerSymbol = <Icon icon={data.type} className="corner_symbol" />;
+    // // Default
+    // else cornerSymbol = <Icon icon={data.type} className="corner_symbol" />;
 
     // Bottom coner
-    let bottomCornerSymbol = cloneElement(cornerSymbol, { className: cornerSymbol.props.className + " bottom_corner_symbol"});
+    // CLONEELEMENT FUNCTION CAUSES VERY POOR PERFORMANCE ON RERENDERS
+    // let bottomCornerSymbol = cloneElement(cornerSymbol, { className: cornerSymbol.props.className + " bottom_corner_symbol"});
 
     // CSS
     let classes = `card${data.color === 'black' ? ' no_decorator' : ''}`;
@@ -62,13 +62,13 @@ export default function Card({ data=null, owner, user, game, rotation=0, onClick
             <div className="oval">{ovalInner}</div>
 
             {/* Corner */}
-            {cornerSymbol}
+            {/* {cornerSymbol} */}
 
             {/* Symbol */}
             <Icon icon={data.type} />
 
             {/* Bottom corner */}
-            {bottomCornerSymbol}
+            {/* {bottomCornerSymbol} */}
         </div>
     )
 }

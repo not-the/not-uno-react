@@ -9,7 +9,7 @@ const icons = {
 
 export default function Icon({ icon, className="" }) {
     const underlined = icon === '6' || icon === '9';
-    const small_text = icon.length > 2;
+    const small_text = icon?.length > 2;
 
     return (
         <div className={`symbol ${className}`}>
