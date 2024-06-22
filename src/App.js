@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import Game from './Game.js'
-import Lobby from './Lobby.js'
+import Game from './components/Game.js'
+import Lobby from './components/Lobby.js'
 
 
 export default function App() {
-    let [menu, setMenu] = useState("lobby");
+    let [menu, setMenu] = useState("game");
 
 
     let page =

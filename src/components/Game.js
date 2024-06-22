@@ -1,14 +1,22 @@
 import Icon from "./Icon.js"
 import Card from "./Card.js"
-import { shuffle, repeat } from "./Util.js"
+import { shuffle, repeat } from "../Util.js"
 import { useEffect, useState } from "react";
 
 
-const data = require('./data.json');
+// Game
+const data = require('../data.json');
 
 const config = {
     deck: "normal",
-    starting_cards: 7
+    starting_cards: 7,
+
+    // allow_continues: false, // Offer to continue game with remaining players after someone wins
+    // require_calling_uno: false,
+    // call_penalty: 'draw',
+    // call_penalty_draw_amount: 2,
+    
+    draw_until_match: false
 }
 
 const defaultGame = {
@@ -23,6 +31,7 @@ const defaultGame = {
     turn: 0,
     turn_rotation_value: 0,
     direction: 1, // 1 is clockwise
+    draw_count: 0, // This turns number of drawn cards
 
     // Dev tools
     control_everyone: true,
@@ -159,7 +168,27 @@ export default function Game() {
     function drawCard(PID) {
         if(game.turn !== PID) return console.warn(`[Player ${PID}] Not your turn`);
 
-        moveCard("deck", PID, false);
+        // Clone
+        const modifiedGame = structuredClone(game);
+
+        // 1 draw limit
+        // if(!config.draw_until_match && game.draw_count > 0) {
+
+        //     // Test if last drawn card is valid. If not, end turn
+        //     const deckTop = game.deck[game.deck.length-1];
+        //     const player = game.players[PID];
+        //     const playerLast = player[player.length-1]
+        //     if(!testCards(deckTop, playerLast)) nextTurn(modifiedGame);
+
+        //     // Update state
+        //     setGame(modifiedGame);
+
+        //     return;
+        // }
+
+        // Move card
+        moveCard("deck", PID, false, modifiedGame);
+        modifiedGame.draw_count++;
     }
 
     // Place card in pile and enact its effects
@@ -192,7 +221,7 @@ export default function Game() {
 
             // Prep for next turn
             if(playerCard.reverse) modifiedGame.direction *= -1;
-            nextTurn(playerCard.skip, modifiedGame)
+            nextTurn(playerCard.skip, modifiedGame);
 
             // Next player
             const nextPlayerID = modifiedGame.turn;
@@ -213,7 +242,7 @@ export default function Game() {
         // }
 
         // else
-            endMove();
+        endMove();
     }
 
     function nextTurn(skip=0, prevGame) {
@@ -223,6 +252,7 @@ export default function Game() {
             prevGame.players.length
         );
         prevGame.turn_rotation_value += turnValue;
+        prevGame.draw_count = 0;
     }
 
     // function runDialogAction(value) {
@@ -246,28 +276,30 @@ export default function Game() {
                 <div id="deck">
                     Player {game.turn+1}'s turn<br/>
                     Deck ({game.deck.length})
-                    {
-                        <Card data={game.deck[game.deck.length-1]} onClick={() => drawCard(game.turn)} />
-                    }
+                    <Card data={game.deck[game.deck.length-1]} onClick={() => drawCard(game.turn)} />
+                    <div className="card_stack" style={{ "height": `${game.deck.length/4}px` }} />
                 </div>
 
-                {/* Arrow */}
-                <div className="arrow_container">
-                    <div id="arrow" style={{ "transform": `rotate(${(game.turn_rotation_value)*90}deg)` }}>🡇</div>
+                {/* Middle */}
+                <div className="middle">
+                    {/* Rotation */}
+                    <div id="rotation" style={{ "transform": `rotate(${game.turn_rotation_value*45}deg) scale(${game.direction}, 1)` }}>
+                        ↻
+                    </div>
+
+                    {/* Arrow */}
+                    <div className="arrow_container">
+                        <div id="arrow" style={{ "transform": `rotate(${(game.turn_rotation_value)*90}deg)` }}>
+                            🡇
+                        </div>
+                    </div>
                 </div>
 
                 <div id="pile">
                     <br/>
                     Pile ({game.pile.length})
-                    {
-                        // game.pile.map((cardData, index) => {
-                        //     return <Card data={cardData} key={index}
-                        //         rotation={(Math.floor(Math.random() * 90)) - 45}
-                        //     />
-                        // })
 
-                        <Card data={game.pile[game.pile.length-1]} />
-                    }
+                    <Card data={game.pile[game.pile.length-1]} />
                 </div>
             </div>
 
