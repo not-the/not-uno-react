@@ -33,7 +33,7 @@ body {
     --bg-b: rgb(78, 104, 49);
 
     background-color: var(--bg-a);
-    background: radial-gradient(closest-side, var(--bg-a) 60%, rgb(56, 73, 39) 130%);
+    background: radial-gradient(closest-corner, var(--bg-a) 60%, rgb(56, 73, 39) 100%);
 
 
     /* background-size: cover;
