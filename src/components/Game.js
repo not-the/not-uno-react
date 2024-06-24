@@ -34,7 +34,7 @@ const defaultGame = {
     draw_count: 0, // This turns number of drawn cards
 
     // Dev tools
-    control_everyone: true,
+    control_everyone: true, // Currently does nothing
     // xray: false,
     xray: true,
 }
