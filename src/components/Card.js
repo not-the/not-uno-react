@@ -55,7 +55,7 @@ export default function Card({ data=null, owner, user, game, rotation=0, onClick
     }
     
     return (
-        <div className={classes} onClick={onClick} tabIndex="0" role="button" draggable="true"
+        <div className={classes} onClick={onClick} tabIndex="0" role="button"
             style={{ ...style, "transform": `rotate(${data.rotation}deg)`, "--card-color": `var(--${data.color})` }}
         >
             {/* Decorator */}

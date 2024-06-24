@@ -43,8 +43,8 @@ const defaultGame = {
 export default function Game() {
 
     // State
-    let [dialog, setDialog] = useState(null);
-    let [dialogAction, setDialogAction] = useState(null);
+    // let [dialog, setDialog] = useState(null);
+    // let [dialogAction, setDialogAction] = useState(null);
 
     // Current user ID
     var user = {
@@ -289,8 +289,10 @@ export default function Game() {
 
                     {/* Arrow */}
                     <div className="arrow_container">
-                        <div id="arrow" style={{ "transform": `rotate(${(game.turn_rotation_value)*90}deg)` }}>
-                            🡇
+                        <div id="arrow" style={{ "transform": `rotate(${(game.turn_rotation_value-1)*90}deg)` }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 117 116">
+                                <path id="Arrow" d="M0,58,59,0V28h58V87H59v29Z" fill="#fff"/>
+                            </svg>
                         </div>
                     </div>
                 </div>

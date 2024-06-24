@@ -86,16 +86,19 @@ nav > button {
 
 
 /* Players */
+.player {
+    max-width: 100vw;
+}
 .player > .inner {
     display: flex;
     gap: 6px;
 
     /* position: absolute; */
 
-    width: max-content;
-    max-width: 100vw;
+    width: unset !important;
+    max-width: 100%;
+    overflow-x: auto;
 
-    overflow: auto;
     padding: 8px;
     border-radius: 16px;
     background-color: rgba(0, 0, 0, 0.2);
@@ -116,6 +119,7 @@ nav > button {
     left: 0;
 
     transform-origin: bottom left;
+    /* transform: rotate(90deg) scale(0.8) translateX(-80%); */
     transform: rotate(90deg) scale(0.8) translateX(-80%);
 }
 .position_2 {
@@ -130,6 +134,7 @@ nav > button {
     right: 0;
 
     transform-origin: bottom right;
+    /* transform: rotate(-90deg) scale(0.8) translateX(80%); */
     transform: rotate(-90deg) scale(0.8) translateX(80%);
 }
 
@@ -144,7 +149,7 @@ nav > button {
 #game_center > .middle {
     display: flex;
     flex-direction: column;
-    /* align-items: center; */
+    align-items: center;
     /* justify-content: center; */
 
     --outline-color: rgb(65, 26, 0);
@@ -159,21 +164,13 @@ nav > button {
 
 #arrow {
     font-size: 48pt;
-    color: rgb(255, 198, 9);
-
-    --outline-color: rgb(255, 255, 255);
 
     /* perspective-origin: 800px; */
     transform: rotate(90deg);
     transition: transform 0.6s ease;
-
-    /* filter:
-        drop-shadow(-1px -1px var(--outline-color))
-        drop-shadow(-1px  1px var(--outline-color))
-        drop-shadow( 1px -1px var(--outline-color))
-        drop-shadow( 0px  -2px var(--outline-color))
-        drop-shadow( 0px  2px var(--outline-color))
-        drop-shadow(6px 6px black); */
+}
+#arrow > svg > path {
+    fill: rgb(255, 198, 9);
 }
 #rotation {
     text-align: center;
@@ -216,17 +213,19 @@ nav > button {
     --card-color: gray;
     --border-color: white;
 
-    display: block;
-    width: 110px;
-    height: 168px;
-    /* aspect-ratio: 110 / 168; */
+    font-size: 110px; /* Determines card width */
+    width: 1em;
+    aspect-ratio: 110 / 168;
+    /* Other values will be: percentOfWidth * 1.1 */
 
+    display: block;
     position: relative;
     overflow: hidden;
+    flex: none;
 
     background-color: var(--card-color);
-    border: 4px solid var(--border-color);
-    border-radius: 12px;
+    border: 0.044em solid var(--border-color); /* 4px */
+    border-radius: 0.132em; /* 12px */
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
 
     user-select: none;
@@ -259,7 +258,7 @@ nav > button {
     background-color: var(--card-color);
     border-radius: 100%;
     transform: skew(-25deg);
-    border: 6px solid var(--border-color);
+    border: 0.06em solid var(--border-color); /* 6px */
 
     top: calc(calc(100% - var(--height)) / 2);
     height: var(--height);
@@ -281,26 +280,31 @@ nav > button {
     left: 50%;
     transform: translate(-50%, -50%);
 
-    width: 50px;
+    font-size: 0.575em;
+    width: 0.8em; /* ~50px */
 
     filter:
-        drop-shadow(3px 3px black)
-        drop-shadow(-1px -1px black)
-        drop-shadow(-1px  1px black)
-        drop-shadow( 1px -1px black)
-        drop-shadow( 0px  -2px black)
-        drop-shadow( 0px  2px black);
+        drop-shadow(0.09em 0.09em black)
+        drop-shadow(-0.01em -0.01em black)
+        drop-shadow(-0.01em  0.01em black)
+        drop-shadow( 0.01em -0.01em black)
+        drop-shadow( 0px  -0.03em black)
+        drop-shadow( 0px  0.03em black);
 
     color: white;
 }
 .card > .symbol > p {
     width: unset;
-    font-size: 48pt;
     font-family: 'Rubik', Arial, Helvetica, sans-serif;
     font-weight: 700;
 
     /* transform-origin: top left;
     rotate: -5deg; */
+}
+
+/* Back logo */
+.card > .symbol > p.small_text {
+    font-size: 0.32em !important;
 }
 
 .card > .symbol.corner_symbol {
@@ -337,7 +341,7 @@ nav > button {
 }
 .card.wild > .oval > .oval_inner > .flex > div {
     width: 50%;
-    height: 50px;
+    height: 0.45em;
     background-color: rgb(255, 181, 181);
     /* border: 2px solid rgb(73, 140, 241); */
 }
@@ -421,9 +425,19 @@ nav > button {
 
 
 
-
-/* @media only screen and (max-width: 720px) {
-    .player {
-        scale: 0.8;
+@media only screen and (max-width: 1100px) {
+    .card {
+        font-size: 95px;
     }
-} */
+    .card_stack { width: 95px; }
+}
+@media only screen and (max-width: 720px) {
+    #game_center {
+        flex-direction: column;
+        gap: 0;
+    }
+    .card {
+        font-size: 72px;
+    }
+    .card_stack { width: 72px; }
+}
