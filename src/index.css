@@ -26,10 +26,27 @@ img {
 
 body {
     margin: 0;
+    color: white;
     font-family: Arial, Helvetica, sans-serif;
 
-    background-color: darkolivegreen;
-    color: white;
+    --bg-a: darkolivegreen;
+    --bg-b: rgb(78, 104, 49);
+
+    background-color: var(--bg-a);
+    background: radial-gradient(closest-side, var(--bg-a) 60%, rgb(56, 73, 39) 130%);
+
+
+    /* background-size: cover;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--bg-a),
+        var(--bg-a) 45px,
+        var(--bg-b) 45px,
+        var(--bg-b) 90px
+    ); */
+
+    width: 100vw;
+    height: 100vh;
 }
 
 .flex {
@@ -117,6 +134,7 @@ nav > button {
 .position_1 {
     position: absolute;
     left: 0;
+    max-width: 95vh;
 
     transform-origin: bottom left;
     /* transform: rotate(90deg) scale(0.8) translateX(-80%); */
@@ -132,6 +150,7 @@ nav > button {
 .position_3 {
     position: absolute;
     right: 0;
+    max-width: 95vh;
 
     transform-origin: bottom right;
     /* transform: rotate(-90deg) scale(0.8) translateX(80%); */
@@ -226,7 +245,7 @@ nav > button {
     background-color: var(--card-color);
     border: 0.044em solid var(--border-color); /* 4px */
     border-radius: 0.132em; /* 12px */
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 5px 9px rgba(0, 0, 0, 0.8);
 
     user-select: none;
     cursor: pointer;

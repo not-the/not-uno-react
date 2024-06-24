@@ -266,10 +266,6 @@ export default function Game() {
     // HTML
     return (
         <>
-        {/* Debug */}
-        <button onClick={() => addPlayer()}>ADD PLAYER</button>
-        <button onClick={() => moveCard("deck", "pile", false)}>Card from deck -&gt; pile</button>
-
         {/* Game container */}
         <div id="game">
             <div id="game_center">
