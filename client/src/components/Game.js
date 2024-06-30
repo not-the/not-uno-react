@@ -4,43 +4,8 @@ import { shuffle, repeat } from "../Util.js"
 import { useEffect, useState } from "react";
 
 
-// Game
-const data = require('../data.json');
 
-const config = {
-    deck: "normal",
-    starting_cards: 7,
-
-    // allow_continues: false, // Offer to continue game with remaining players after someone wins
-    // require_calling_uno: false,
-    // call_penalty: 'draw',
-    // call_penalty_draw_amount: 2,
-    
-    draw_until_match: false
-}
-
-const defaultGame = {
-    started: false,
-    state: 'play',
-    winner: false,
-
-    deck: structuredClone(data.decks[config.deck]), // Deck you draw from
-    pile: [], // Played cards pile
-
-    players: [],
-    turn: 0,
-    turn_rotation_value: 0,
-    direction: 1, // 1 is clockwise
-    draw_count: 0, // This turns number of drawn cards
-
-    // Dev tools
-    control_everyone: true, // Currently does nothing
-    // xray: false,
-    xray: true,
-}
-
-
-export default function Game() {
+export default function Game({ config, game, setGame }) {
 
     // State
     // let [dialog, setDialog] = useState(null);
@@ -50,9 +15,6 @@ export default function Game() {
     var user = {
         id: 0
     };
-
-    // Game
-    let [game, setGame] = useState(structuredClone(defaultGame));
 
     // Object to modify while setting up game
     let setupGame = structuredClone(game);

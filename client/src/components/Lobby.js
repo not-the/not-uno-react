@@ -4,7 +4,9 @@ export default function Lobby() {
     return (
         <div id="lobby">
 
+            <button>PLAY</button>
 
+            {/* Options */}
             <div id="config">
                 {/* Starting cards */}
                 <div className="item">

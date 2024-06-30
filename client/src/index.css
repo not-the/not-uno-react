@@ -61,6 +61,13 @@ body {
 
 /* Button */
 button {
+    min-width: 120px;
+    font-size: 12pt;
+    padding: 6px 12px;
+    margin: 3px; /* Temporary */
+    border: none;
+    border-radius: 6px;
+
     cursor: pointer;
 }
 
