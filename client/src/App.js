@@ -26,7 +26,7 @@ const newGame = () => {
     return {
         // Player-specific
         player_num: 0,
-        host: true,
+        // host: true,
         
         // State
         // started: false,
@@ -59,7 +59,7 @@ export default function App() {
     const [game, setGame] = useState(structuredClone(defaultGame));
 
     // Menu {String}
-    const [menu, setMenu] = useState("game");
+    const [menu, setMenu] = useState("null");
     const page =
         menu === "game" ? <Game config={config} game={game} setGame={setGame} /> : // Game
         menu === "lobby" ? <Lobby config={config} game={game} setGame={setGame} /> : // Lobby
@@ -86,6 +86,10 @@ export default function App() {
         let urlRoom = window.location.hash.substring(1);
         if(urlRoom === '') urlRoom = undefined;
         socket.emit("join", urlRoom);
+    }
+
+    function debugDataRequest() {
+        socket.emit("debug", true);
     }
 
     const [toasts, setToasts] = useState([]);
@@ -121,6 +125,13 @@ export default function App() {
 
         // Joined to room
         socket.on("joined", roomID => {
+            // Left
+            if(!roomID) {
+                setMenu("home");
+                window.location.hash = '';
+                return;
+            }
+
             if(window.location.hash === '') window.location.hash = `#${roomID}`;
 
             setMenu("lobby");
@@ -131,11 +142,20 @@ export default function App() {
             toast(data);
         });
 
+        // Receive debug data
+        socket.on("debug", data => {
+            for(const [key, value] of Object.entries(data)) {
+                console.log(key);
+                console.log(value);
+            }
+        })
+
         // Unmount
         return () => {
             socket.off("chat_receive");
             socket.off("join");
             socket.off("toast");
+            socket.off("debug");
             window.location.hash = '';
         }
     }, []);
@@ -178,7 +198,10 @@ export default function App() {
 
             {/* Toasts */}
             <div id="toasts">
-                {toasts.map((t, index) => <Toast data={t} index={index} />)}
+                {toasts.map((t, index) => <Toast data={t} key={index} />)}
+
+                {/* Debug tools */}
+                <button onClick={debugDataRequest}>Log server data</button>
             </div>
         </>
     );

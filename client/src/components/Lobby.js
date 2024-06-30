@@ -5,9 +5,13 @@ export default function Lobby() {
         <div id="lobby">
 
             <button>PLAY</button>
+            <br/>
+            <br/>
+            <br/>
 
             {/* Options */}
             <div id="config">
+                <h2>Modifiers</h2>
                 {/* Starting cards */}
                 <div className="item">
                     <label htmlFor="starting_cards">

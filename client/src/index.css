@@ -398,11 +398,13 @@ nav > button {
     background-color: rgb(61, 83, 68);
     width: 240px;
     max-width: 100%;
-    padding: 18px 24px;
     border-radius: 32px 12px 32px 12px;
     border: 3px solid white;
 
     box-shadow: 0 2px 9px rgba(0, 0, 0, 0.6);
+}
+.toast > .inner {
+    padding: 18px 24px;
 }
 .toast h3 {
     margin-bottom: 12px;
@@ -454,12 +456,16 @@ nav > button {
     position: fixed;
     bottom: 24px;
     right: 24px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
 }
-#toasts > .toast {
+.toast {
     background-color: rgb(35, 59, 82);
-    padding: 12px 24px;
     border-radius: 9px;
     border: 1px solid rgba(255, 255, 255, 0.35);
+    overflow: hidden;
 }
 .toast .toast_time_bar {
     width: 100%;
@@ -468,9 +474,7 @@ nav > button {
     animation: toast_time_bar 6s forwards linear;
 }
 @keyframes toast_time_bar {
-    to {
-        width: 0;
-    }
+    to { width: 0; }
 }
 
 
