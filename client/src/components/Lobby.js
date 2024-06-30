@@ -11,7 +11,7 @@ export default function Lobby() {
 
             {/* Options */}
             <div id="config">
-                <h2>Modifiers</h2>
+                <h2>Options</h2>
                 {/* Starting cards */}
                 <div className="item">
                     <label htmlFor="starting_cards">

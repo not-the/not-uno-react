@@ -201,7 +201,7 @@ export default function App() {
                 {toasts.map((t, index) => <Toast data={t} key={index} />)}
 
                 {/* Debug tools */}
-                <button onClick={debugDataRequest}>Log server data</button>
+                <button onClick={debugDataRequest}>Request server data</button>
             </div>
         </>
     );

@@ -466,6 +466,26 @@ nav > button {
     border-radius: 9px;
     border: 1px solid rgba(255, 255, 255, 0.35);
     overflow: hidden;
+
+    animation: toast-anim 6s forwards ease;
+}
+@keyframes toast-anim {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    5% {
+        opacity: 1;
+        transform: none;
+    }
+    95% {
+        opacity: 1;
+        transform: none;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
 }
 .toast .toast_time_bar {
     width: 100%;
