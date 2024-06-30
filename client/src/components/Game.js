@@ -11,11 +11,6 @@ export default function Game({ config, game, setGame }) {
     // let [dialog, setDialog] = useState(null);
     // let [dialogAction, setDialogAction] = useState(null);
 
-    // Current user ID
-    var user = {
-        id: 0
-    };
-
     // Object to modify while setting up game
     let setupGame = structuredClone(game);
 
@@ -110,7 +105,7 @@ export default function Game({ config, game, setGame }) {
         //     const key = event.key.toUpperCase();
             
         //     if(!isNaN(Number(key))) {
-        //         playCard(user.id, Number(key)-1)
+        //         playCard(game.player_num, Number(key)-1)
         //     }
         // }
         // document.addEventListener('keyup', keyupHandler);
@@ -156,7 +151,7 @@ export default function Game({ config, game, setGame }) {
     // Place card in pile and enact its effects
     function playCard(PID, cardID) {
         if(game.turn !== PID) {
-            console.warn(`[Player ${user.id}] Not your turn`);
+            console.warn(`[Player ${game.player_num}] Not your turn`);
             return false;
         };
 
@@ -165,14 +160,14 @@ export default function Game({ config, game, setGame }) {
         // Cards
         const playerCard = modifiedGame.players[PID][cardID];
         if(playerCard === undefined) {
-            console.warn(`[Player ${user.id}] Card #${cardID} doesn't exist`);
+            console.warn(`[Player ${game.player_num}] Card #${cardID} doesn't exist`);
             return false;
         };
         const pileTop = modifiedGame.pile[game.pile.length-1];
 
         // Test
         if(!testCards(playerCard, pileTop)) {
-            console.warn(`[Player ${user.id}] Invalid card`);
+            console.warn(`[Player ${game.player_num}] Invalid card`);
             return false;
         }
 
@@ -265,7 +260,7 @@ export default function Game({ config, game, setGame }) {
 
             {/* Players */}
             {game.players.map((player, playerIndex) => {
-                const classes = `player position_${clamp(playerIndex-user.id, game.players.length)}`;
+                const classes = `player position_${clamp(playerIndex-game.player_num, game.players.length)}`;
 
                 return (
                     <div className={classes} key={playerIndex}>
@@ -275,7 +270,7 @@ export default function Game({ config, game, setGame }) {
                         <div className="inner">
                             {player.map((cardData, cardIndex) => {
                                 return <Card data={cardData} key={cardIndex}
-                                    owner={playerIndex} user={user} game={game}
+                                    owner={playerIndex} game={game}
                                     onClick={function() { playCard(playerIndex, cardIndex) }}
                                 />
                             })}

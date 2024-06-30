@@ -2,7 +2,7 @@
 
 import Icon from "./Icon.js"
 
-export default function Card({ data=null, owner, user, game, rotation=0, onClick, style={} }) {
+export default function Card({ data=null, owner, game, rotation=0, onClick, style={} }) {
 
     // Empty
     if(data === null) return (
@@ -10,7 +10,7 @@ export default function Card({ data=null, owner, user, game, rotation=0, onClick
     )
 
     // Card back
-    let visible = (data.hidden || (owner !== user?.id));
+    let visible = (data.hidden || (owner !== game?.player_num));
     if(visible && !game?.xray) return (
             <div className="card back" onClick={onClick} tabIndex="0" role="button">
                 <div className="oval"/>

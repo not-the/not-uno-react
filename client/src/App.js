@@ -24,9 +24,14 @@ const config = {
 
 const newGame = () => {
     return {
-        started: false,
-        state: 'play',
-        winner: false,
+        // Player-specific
+        player_num: 0,
+        host: true,
+        
+        // State
+        // started: false,
+        // state: 'play',
+        // winner: false,
     
         deck: structuredClone(data.decks[config.deck]), // Deck you draw from
         pile: [], // Played cards pile
@@ -54,7 +59,7 @@ export default function App() {
     const [game, setGame] = useState(structuredClone(defaultGame));
 
     // Menu {String}
-    const [menu, setMenu] = useState("null");
+    const [menu, setMenu] = useState("game");
     const page =
         menu === "game" ? <Game config={config} game={game} setGame={setGame} /> : // Game
         menu === "lobby" ? <Lobby config={config} game={game} setGame={setGame} /> : // Lobby
