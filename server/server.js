@@ -31,7 +31,7 @@ function getRoomUUID(uuid=crypto.randomUUID()) {
     result = result.substring(0, 9);
 
     return result;
-  }
+}
 
 
 // Listeners
@@ -41,26 +41,40 @@ io.on("connection", (socket) => {
 
     // Join
     socket.on("join", data => {
-        let roomID = data ?? getRoomUUID();
+        const roomID = data ?? getRoomUUID();
         joinRoom(roomID);
     })
     
     // Join room handler
     function joinRoom(roomID) {
+        // Not a string or too long
+        if(typeof roomID !== 'string' || roomID.length > 32) {
+            console.warn(`Failed trying to join room: User ID ${socket.id}`);
+            socket.emit("toast", {
+                title: "Error",
+                msg: `Failed trying to join room: User ID ${socket.id}`
+            });
+            return;
+        };
+
         // Leave previous
-        for(let r of socket.rooms) socket.leave(r);
+        for(const r of socket.rooms) socket.leave(r);
 
         // Join
         socket.join(roomID);
         socket.emit("joined", roomID);
         console.log(socket.id, ' is in rooms: ', socket.rooms);
+
+        socket.emit("toast", {
+            title: "Joined game",
+            msg: `Room ID: "${roomID}"`
+        });
+
     }
 
     // Chat message
     socket.on("chat", (data) => {
-        console.log(data);
-
-        let roomID = [...socket.rooms][0];
+        const roomID = [...socket.rooms][0];
         console.log("ROOM: ", roomID);
 
         // Broadcast

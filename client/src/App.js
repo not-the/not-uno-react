@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Game from './components/Game.js'
 import Lobby from './components/Lobby.js'
+import Toast from './components/Toast.js'
 
 // Socket.io
 import { socket } from './socket.js';
@@ -50,11 +51,11 @@ const defaultGame = newGame();
 export default function App() {
 
     // Game
-    let [game, setGame] = useState(structuredClone(defaultGame));
+    const [game, setGame] = useState(structuredClone(defaultGame));
 
     // Menu {String}
-    let [menu, setMenu] = useState("null");
-    let page =
+    const [menu, setMenu] = useState("null");
+    const page =
         menu === "game" ? <Game config={config} game={game} setGame={setGame} /> : // Game
         menu === "lobby" ? <Lobby config={config} game={game} setGame={setGame} /> : // Lobby
         null; // Home
@@ -63,14 +64,16 @@ export default function App() {
     // Chat
     const [chatInput, setChatInput] = useState("");
 
+
+    const [chatCache, setChatCache] = useState([]);
+    const newChatMsg = (msg) => {
+        setChatCache(old => [...old, msg]); // Push new message
+    }
+
     const sendChat = () => {
         socket.emit("chat", { msg:chatInput });
         // newChatMsg(chatInput);
         // setChatInput("");
-    }
-
-    const newChatMsg = (msg) => {
-        setChatCache(old => [...old, msg]); // Push new message
     }
 
     const joinRoom = () => {
@@ -80,7 +83,28 @@ export default function App() {
         socket.emit("join", urlRoom);
     }
 
-    const [chatCache, setChatCache] = useState([]);
+    const [toasts, setToasts] = useState([]);
+    function toast(data) {
+        setToasts(old => [...old, data]); // Push new toast
+
+        // Timer
+        // Animation
+        setTimeout(() => {
+            setToasts(old => {
+                let index = old.indexOf(data);
+                return old.splice(index, 1);
+            }); // Remove toast
+        }, 6000);
+
+        // Remove
+        // setTimeout(() => {
+        //     setToasts(old => {
+        //         let index = old.indexOf(data);
+        //         return old.splice(index, 1);
+        //     }); // Remove toast
+        // }, 6200);
+    }
+
     useEffect(() => {
         // Auto join from URL
         if(window.location.hash !== '') joinRoom();
@@ -95,12 +119,18 @@ export default function App() {
             if(window.location.hash === '') window.location.hash = `#${roomID}`;
 
             setMenu("lobby");
-        })
+        });
+
+        // Toast notification
+        socket.on("toast", (data) => {
+            toast(data);
+        });
 
         // Unmount
         return () => {
             socket.off("chat_receive");
             socket.off("join");
+            socket.off("toast");
             window.location.hash = '';
         }
     }, []);
@@ -128,6 +158,7 @@ export default function App() {
             <br/>
             <br/>
 
+            {/* Game */}
             <main>
                 {
                     page ??
@@ -139,6 +170,11 @@ export default function App() {
                     </>
                 }
             </main>
+
+            {/* Toasts */}
+            <div id="toasts">
+                {toasts.map((t, index) => <Toast data={t} index={index} />)}
+            </div>
         </>
     );
 }

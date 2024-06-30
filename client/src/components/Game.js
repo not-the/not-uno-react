@@ -287,7 +287,7 @@ export default function Game({ config, game, setGame }) {
 
         {/* Dialog */}
         {/* {dialog === 'choose_color' ?
-            <div className="dialog">
+            <div className="dialog toast">
                 <h3>CHOOSE A COLOR</h3>
                 <div className="choose_color_container">
                     <div className="red" role="button" tabIndex="0" onClick={runDialogAction("red")} />

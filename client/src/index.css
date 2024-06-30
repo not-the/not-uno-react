@@ -394,11 +394,7 @@ nav > button {
 }
 
 
-.dialog {
-    position: absolute;
-    bottom: 24px;
-    right: 24px;
-
+.toast {
     background-color: rgb(61, 83, 68);
     width: 240px;
     max-width: 100%;
@@ -408,7 +404,7 @@ nav > button {
 
     box-shadow: 0 2px 9px rgba(0, 0, 0, 0.6);
 }
-.dialog h3 {
+.toast h3 {
     margin-bottom: 12px;
     font-weight: 800;
     font-size: 13.5pt;
@@ -451,6 +447,38 @@ nav > button {
 
 
 
+
+
+/* Toasts */
+#toasts {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+}
+#toasts > .toast {
+    background-color: rgb(35, 59, 82);
+    padding: 12px 24px;
+    border-radius: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.toast .toast_time_bar {
+    width: 100%;
+    height: 3px;
+    background-color: white;
+    animation: toast_time_bar 6s forwards linear;
+}
+@keyframes toast_time_bar {
+    to {
+        width: 0;
+    }
+}
+
+
+
+
+
+
+/* Media queries */
 @media only screen and (max-width: 1100px) {
     .card {
         font-size: 95px;
