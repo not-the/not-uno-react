@@ -71,7 +71,10 @@ export default function Game({ game, setGame }) {
                 {/* Middle */}
                 <div className="middle">
                     {/* DEBUG */}
-                    pnum: {game.my_num}
+                    <div>
+                        pnum: {game.my_num}<br/>
+                        socketID: {socket.id}
+                    </div>
 
                     {/* Rotation */}
                     <div id="rotation" style={{ "transform": `rotate(${game.turn_rotation_value*45}deg) scale(${game.direction}, 1)` }}>

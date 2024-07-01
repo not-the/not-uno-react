@@ -196,13 +196,20 @@ class Uno {
 
         // if(this.players.length < 2) return console.warn("Not enough players");
         this.state = "ingame";
-        repeat(() => this.addPlayer(socket), this.playersBySocket.length);
+        this.generatePlayers();
         this.updateClients();
     }
 
-    addPlayer(socket) {
+    generatePlayers() {
+        let sockets = this.playersBySocket;
+        for(let i = 0; i < sockets.length; i++) {
+            this.addPlayer(sockets[i]);
+        }
+    }
+
+    addPlayer(socketID) {
         this.players.push({
-            socketid: socket.id,
+            socketID,
             cards: []
         });
 

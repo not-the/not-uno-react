@@ -118,15 +118,13 @@ export default function App() {
             setGame(data);
 
             // User ID
-            // console.log(data.players, socket.id);
-            // console.log(getPnumFromSocketID(data.players, socket.id));
             data.my_num = getPnumFromSocketID(data.players, socket.id);
 
-            console.log('players: ', data.players);
+            console.log(data.players, socket.id);
 
             /** this also exists serverside? */
             function getPnumFromSocketID(players, socketID) {
-                return players.findIndex(p => console.log(p.socketid, socketID));
+                return players.findIndex(p => p.socketID === socketID);
             }
 
             // Set menu
