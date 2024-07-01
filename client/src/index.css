@@ -396,8 +396,7 @@ nav > button {
 
 .toast {
     background-color: rgb(61, 83, 68);
-    width: 240px;
-    max-width: 100%;
+    width: 100%;
     border-radius: 32px 12px 32px 12px;
     border: 3px solid white;
 
@@ -456,6 +455,9 @@ nav > button {
     position: fixed;
     bottom: 24px;
     right: 24px;
+
+    width: 100%;
+    max-width: 240px;
 
     display: flex;
     flex-direction: column;

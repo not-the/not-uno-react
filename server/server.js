@@ -94,8 +94,11 @@ function testCards(card_a, card_b) {
 }
 
 /** Sets the hidden property to true for all cards in an array */
-function hideAll(arr) {
-    for(let i in arr) arr[i].hidden = true;
+function hideAll(arr, obfuscate) {
+    for(let i in arr) {
+        if(obfuscate) arr[i] = { hidden:true }; // Strip all other card data
+        else arr[i].hidden = true; // Set hidden property but leave card data intact
+    }
     return arr;
 }
 
@@ -146,7 +149,7 @@ class Uno {
 
         // Dev tools
         this.control_everyone = true; // Currently does nothing
-        xray: false;
+        this.xray = false;
         // this.xray = true;
 
         // Register game
@@ -154,7 +157,7 @@ class Uno {
 
 
         // Setup
-        hideAll(this.deck);
+        hideAll(this.deck, false);
         shuffle(this.deck); // Shuffle
 
         // this.addPlayer(); // Player
@@ -178,8 +181,36 @@ class Uno {
     /** Send game state to clients */
     updateClients() {
         let clone = structuredClone(this);
+
+        // Flatten data
         clone.usersParsed = this.users; // User list
-        this.emit("gameState", clone);
+        hideAll(clone.deck, true); // Obfuscate deck
+
+        // Tailor data for each user
+        // Cards that aren't visible to users are stripped of their
+        // data before being sent to prevent cheating via devtools
+        const sockets = this.playersBySocket;
+        for(const socketID of sockets) {
+            let tailoredGame = structuredClone(clone);
+
+            // User ID
+            tailoredGame.my_num = getPnumFromSocketID(tailoredGame.players, socketID);
+            function getPnumFromSocketID(players, socketID) {
+                return players.findIndex(p => p.socketID === socketID);
+            }
+
+            // Other player's cards
+            for(const pnum in tailoredGame.players) {
+                console.log(pnum, tailoredGame.my_num);
+                if(pnum != tailoredGame.my_num) hideAll(tailoredGame.players[pnum].cards, true);
+            }
+
+            // Emit
+            io.to(socketID).emit("gameState", tailoredGame);
+        }
+        
+        // Emit raw data
+        // this.emit("gameState", clone);
     }
 
     /** Emits to game's room */
@@ -215,7 +246,7 @@ class Uno {
 
         // Give cards
         const pnum = this.players.length-1;
-        repeat(() => this.moveCard("deck", pnum, false), this.config.starting_cards);
+        repeat(() => this.moveCard("deck", pnum, false, undefined, false), this.config.starting_cards);
 
         this.updateClients();
     }
@@ -227,7 +258,7 @@ class Uno {
      * @param {Number} fromIndex 
      * @returns 
      */
-    moveCard(fromName, toName, hidden, fromIndex) {
+    moveCard(fromName, toName, hidden, fromIndex, runUpdateClients=true) {
         // Get to/from locations
         let from = typeof fromName === 'number' ?
             this.players[fromName].cards : // Player
@@ -252,11 +283,11 @@ class Uno {
             this.pile = [ this.pile[this.pile.length-1] ];
 
             // Hide/shuffle
-            hideAll(this.deck);
+            hideAll(this.deck, false);
             shuffle(this.deck);
         }
 
-        this.updateClients();
+        if(runUpdateClients) this.updateClients();
     }
 
 
@@ -380,6 +411,8 @@ io.on("connection", (socket) => {
     // Set user profile
     socket.on("setUser", data => setUser(data));
     function setUser(data) {
+        console.log("[setUser]: ", data);
+
         const existing = allusers?.[socket.id];
         allusers[socket.id] = {
             name: data?.name ?? existing?.name ?? randomName(),
@@ -422,6 +455,9 @@ io.on("connection", (socket) => {
 
         // Leave all other rooms
         for(const r of socket.rooms) leaveRoom(r, false);
+        
+        // Rejoin personal room
+        socket.join(socket.id);
 
         // Join
         usersRooms[socket.id] = roomID;
@@ -490,7 +526,7 @@ io.on("connection", (socket) => {
     socket.on("chat", (data) => {
         if(typeof data.msg !== 'string' || data.msg.length < 1) return;
 
-        const roomID = [...socket.rooms][0];
+        const roomID = usersRooms[socket.id];
         
         data.user = allusers[socket.id];
         console.log(`[${roomID}] ${data.user.name}: ${data.msg}`);
@@ -522,7 +558,7 @@ io.on("connection", (socket) => {
 
     // FUNCTIONS
     function getGameByUser() {
-        return allgames[[...socket.rooms][0]];
+        return allgames[usersRooms[socket.id]];
     }
 })
 

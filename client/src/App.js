@@ -115,17 +115,20 @@ export default function App() {
         });
 
         socket.on("gameState", data => {
+            console.log(data);
+
+            // State
             setGame(data);
 
-            // User ID
-            data.my_num = getPnumFromSocketID(data.players, socket.id);
+            // // User ID
+            // data.my_num = getPnumFromSocketID(data.players, socket.id);
 
-            console.log(data.players, socket.id);
+            // console.log(data.players, socket.id);
 
-            /** this also exists serverside? */
-            function getPnumFromSocketID(players, socketID) {
-                return players.findIndex(p => p.socketID === socketID);
-            }
+            // /** this also exists serverside? */
+            // function getPnumFromSocketID(players, socketID) {
+            //     return players.findIndex(p => p.socketID === socketID);
+            // }
 
             // Set menu
             if(data.state === 'lobby') setMenu("lobby");
@@ -217,6 +220,11 @@ export default function App() {
 
                 {/* Debug tools */}
                 <button onClick={debugDataRequest}>Request server data</button>
+                <div>
+                    <strong>debug:</strong><br/>
+                    pnum: {game?.my_num}<br/>
+                    socketID: {socket?.id}
+                </div>
             </div>
         </>
     );

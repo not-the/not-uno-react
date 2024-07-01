@@ -12,15 +12,15 @@ export default function Lobby({ game, startGame }) {
             <div>
                 <h2>Players</h2>
                 <div id="lobby_users">
-                    {Object.entries(game.usersParsed).map(([socketID, user]) => {
+                    {Object.entries(game.usersParsed).map(([socketID, user], index) => {
                         return (
-                            <div className="user">
+                            <div className="user" key={index}>
                                 <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="" />
                                 <p>{socketID === game.host ? "👑" : ""}</p>
                                 <strong>
                                     {user.name}
                                 </strong>
-                                <span class="socketid">[{socketID}]</span>
+                                <span className="socketid">[{socketID}]</span>
                             </div>
                         )
                     })}
