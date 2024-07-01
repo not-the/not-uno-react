@@ -2,118 +2,32 @@ import Icon from "./Icon.js"
 import Card from "./Card.js"
 import { shuffle, repeat } from "../Util.js"
 import { useEffect, useState } from "react";
+import { socket } from "../socket.js";
 
 
 
-export default function Game({ config, game, setGame }) {
+export default function Game({ game, setGame }) {
 
     // State
     // let [dialog, setDialog] = useState(null);
     // let [dialogAction, setDialogAction] = useState(null);
 
-    // Object to modify while setting up game
-    let setupGame = structuredClone(game);
-
-    function addPlayer(prevGame) {
-        let modifiedGame = prevGame ?? structuredClone(game);
-        modifiedGame.dude = true;
-        modifiedGame.players.push([]);
-        setGame(modifiedGame);
-
-        // Give cards
-        let PID = modifiedGame.players.length-1;
-        repeat(() => moveCard("deck", PID, false, modifiedGame), config.starting_cards);
-    }
-
-    function moveCard(fromName, toName, hidden, prevGame, fromIndex) {
-        let modifiedGame = prevGame ?? structuredClone(game);
-
-        // Get to/from locations
-        let from = typeof fromName === 'number' ?
-            modifiedGame.players[fromName] : // Player
-            modifiedGame[fromName]; // Location
-        let to = typeof toName === 'number' ?
-            modifiedGame.players[toName] : // Player
-            modifiedGame[toName]; // Location
-
-        // Take card
-        let card = fromIndex === undefined ? from.shift() : from.splice(fromIndex, 1)[0];
-
-        if(card === undefined) return console.warn('Card is undefined'); // Error
-        if(hidden !== undefined) card.hidden = hidden; // Unhide
-        to.push(card); // Move
-
-        // Empty deck
-        if(fromName === 'deck' && modifiedGame.deck.length === 0) {
-            console.log('Shuffling pile back into deck');
-
-            // Move cards
-            modifiedGame.deck = structuredClone(modifiedGame.pile.slice(0, -1));
-            modifiedGame.pile = [ modifiedGame.pile[modifiedGame.pile.length-1] ];
-
-            // Hide/shuffle
-            hideAll(modifiedGame.deck);
-            shuffle(modifiedGame.deck);
-        }
-
-        setGame(modifiedGame);
-    }
-
-    /** Tests whether a move is valid
-     * @param {Object} card_a 
-     * @param {Object} card_b 
-     * @returns {Boolean}
-     */
-    function testCards(card_a, card_b) {
-        if(
-            card_a.type === card_b.type // Type
-            || card_a.color === card_b.color // Color
-            || card_a.color === "black"
-            || card_b.color === "black"
-        ) return true;
-        return false;
-    }
-
-    let started = false;
-
-    function hideAll(arr) {
-        for(let i in arr) arr[i].hidden = true;
-        return arr;
-    }
-
     // Setup
-    useEffect(() => {
-        if(!started) {
-            let modifiedGame = setupGame;
-            hideAll(modifiedGame.deck);
-            shuffle(modifiedGame.deck); // Shuffle
-            started = true;
-            // setGame({ ...modifiedGame, started:true });
-
-            // Add players
-            addPlayer(modifiedGame); // Player
-            addPlayer(modifiedGame); // Player
-            addPlayer(modifiedGame); // Player
-            addPlayer(modifiedGame); // Player
-            moveCard("deck", "pile", false, modifiedGame); // First card
-
-            setGame(modifiedGame);
-        }
-
-        // Keybinds
-        // const keyupHandler = (event) => {
-        //     const key = event.key.toUpperCase();
+    // useEffect(() => {
+    //     // Keybinds
+    //     const keyupHandler = (event) => {
+    //         const key = event.key.toUpperCase();
             
-        //     if(!isNaN(Number(key))) {
-        //         playCard(game.player_num, Number(key)-1)
-        //     }
-        // }
-        // document.addEventListener('keyup', keyupHandler);
+    //         if(!isNaN(Number(key))) {
+    //             playCard(game.my_num, Number(key)-1)
+    //         }
+    //     }
+    //     document.addEventListener('keyup', keyupHandler);
 
-        // return () => {
-        //     document.removeEventListener('keyup', keyupHandler);
-        // }
-    }, [])
+    //     return () => {
+    //         document.removeEventListener('keyup', keyupHandler);
+    //     }
+    // }, [])
 
 
     // Uses modulus operator to keep value within amount
@@ -123,93 +37,14 @@ export default function Game({ config, game, setGame }) {
 
     // Player functions
     function drawCard(PID) {
-        if(game.turn !== PID) return console.warn(`[Player ${PID}] Not your turn`);
-
-        // Clone
-        const modifiedGame = structuredClone(game);
-
-        // 1 draw limit
-        // if(!config.draw_until_match && game.draw_count > 0) {
-
-        //     // Test if last drawn card is valid. If not, end turn
-        //     const deckTop = game.deck[game.deck.length-1];
-        //     const player = game.players[PID];
-        //     const playerLast = player[player.length-1]
-        //     if(!testCards(deckTop, playerLast)) nextTurn(modifiedGame);
-
-        //     // Update state
-        //     setGame(modifiedGame);
-
-        //     return;
-        // }
-
-        // Move card
-        moveCard("deck", PID, false, modifiedGame);
-        modifiedGame.draw_count++;
+        socket.emit("drawCard", PID);
     }
 
     // Place card in pile and enact its effects
     function playCard(PID, cardID) {
-        if(game.turn !== PID) {
-            console.warn(`[Player ${game.player_num}] Not your turn`);
-            return false;
-        };
-
-        const modifiedGame = structuredClone(game);
-
-        // Cards
-        const playerCard = modifiedGame.players[PID][cardID];
-        if(playerCard === undefined) {
-            console.warn(`[Player ${game.player_num}] Card #${cardID} doesn't exist`);
-            return false;
-        };
-        const pileTop = modifiedGame.pile[game.pile.length-1];
-
-        // Test
-        if(!testCards(playerCard, pileTop)) {
-            console.warn(`[Player ${game.player_num}] Invalid card`);
-            return false;
-        }
-
-
-        const endMove = () => {
-            // Play card
-            moveCard(PID, "pile", false, modifiedGame, cardID);
-
-            // Prep for next turn
-            if(playerCard.reverse) modifiedGame.direction *= -1;
-            nextTurn(playerCard.skip, modifiedGame);
-
-            // Next player
-            const nextPlayerID = modifiedGame.turn;
-            if(playerCard.draw) repeat(() => moveCard("deck", nextPlayerID, false, modifiedGame), playerCard.draw);
-
-            // Update state
-            setGame(modifiedGame);
-        }
-
-
-        // Choose color
-        // if(playerCard.choose_color) {
-        //     setDialog('choose_color');
-        //     setDialogAction(function(value) {
-        //         playerCard.color = value;
-        //         endMove();
-        //     });
-        // }
-
-        // else
-        endMove();
-    }
-
-    function nextTurn(skip=0, prevGame) {
-        const turnValue = ((1 + skip) * prevGame.direction);
-        prevGame.turn = clamp(
-            prevGame.turn + turnValue,
-            prevGame.players.length
-        );
-        prevGame.turn_rotation_value += turnValue;
-        prevGame.draw_count = 0;
+        socket.emit("playCard", {
+            PID, cardID
+        })
     }
 
     // function runDialogAction(value) {
@@ -235,6 +70,9 @@ export default function Game({ config, game, setGame }) {
 
                 {/* Middle */}
                 <div className="middle">
+                    {/* DEBUG */}
+                    pnum: {game.my_num}
+
                     {/* Rotation */}
                     <div id="rotation" style={{ "transform": `rotate(${game.turn_rotation_value*45}deg) scale(${game.direction}, 1)` }}>
                         ↻
@@ -242,7 +80,7 @@ export default function Game({ config, game, setGame }) {
 
                     {/* Arrow */}
                     <div className="arrow_container">
-                        <div id="arrow" style={{ "transform": `rotate(${(game.turn_rotation_value-1)*90}deg)` }}>
+                        <div id="arrow" style={{ "transform": `rotate(${(game.turn_rotation_value-1-game.my_num)*90}deg)` }}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 117 116">
                                 <path id="Arrow" d="M0,58,59,0V28h58V87H59v29Z" fill="#fff"/>
                             </svg>
@@ -260,7 +98,7 @@ export default function Game({ config, game, setGame }) {
 
             {/* Players */}
             {game.players.map((player, playerIndex) => {
-                const classes = `player position_${clamp(playerIndex-game.player_num, game.players.length)}`;
+                const classes = `player position_${clamp(playerIndex-game.my_num, game.players.length)}`;
 
                 return (
                     <div className={classes} key={playerIndex}>
@@ -268,7 +106,7 @@ export default function Game({ config, game, setGame }) {
 
                         {/* Cards */}
                         <div className="inner">
-                            {player.map((cardData, cardIndex) => {
+                            {player.cards.map((cardData, cardIndex) => {
                                 return <Card data={cardData} key={cardIndex}
                                     owner={playerIndex} game={game}
                                     onClick={function() { playCard(playerIndex, cardIndex) }}

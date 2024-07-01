@@ -460,12 +460,15 @@ nav > button {
     display: flex;
     flex-direction: column;
     gap: 9px;
+
+    /* pointer-events: none; */
 }
 .toast {
     background-color: rgb(35, 59, 82);
     border-radius: 9px;
     border: 1px solid rgba(255, 255, 255, 0.35);
     overflow: hidden;
+    /* pointer-events: initial; */
 
     animation: toast-anim 6s forwards ease;
 }
@@ -498,6 +501,49 @@ nav > button {
 }
 
 
+
+
+/* Chat (temporary) */
+#chat {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+    background-color: rgb(35, 59, 82);
+    padding: 12px 18px;
+    border-radius: 6px;
+    border: 1px solid gray;
+
+    width: 100%;
+    max-width: 340px;
+}
+.chat_messages {
+    max-height: min(100vh, 220px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.chat_messages > p {
+    border-top: 1px solid gray;
+    padding: 2px 0;
+}
+
+.user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+}
+.user strong {
+    font-size: 13pt;
+}
+.user .socketid {
+    font-size: 10pt;
+    opacity: 0.6;
+}
 
 
 

@@ -26,3 +26,6 @@ export function repeat(func, times=1) {
     func();
     times && --times && repeat(func, times);
 }
+
+/** Stores objects using localStorage */
+export function store(key, value) { return value ? localStorage.setItem(key, JSON.stringify(value)) : JSON.parse(localStorage.getItem(key)); }

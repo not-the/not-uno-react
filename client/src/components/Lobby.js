@@ -1,13 +1,35 @@
 // import { config } from "./App"
 
-export default function Lobby() {
+export default function Lobby({ game, startGame }) {
     return (
         <div id="lobby">
 
-            <button>PLAY</button>
+            <button onClick={startGame}>PLAY</button>
             <br/>
             <br/>
+
+            {/* Players */}
+            <div>
+                <h2>Players</h2>
+                <div id="lobby_users">
+                    {Object.entries(game.usersParsed).map(([socketID, user]) => {
+                        return (
+                            <div className="user">
+                                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="" />
+                                <p>{socketID === game.host ? "👑" : ""}</p>
+                                <strong>
+                                    {user.name}
+                                </strong>
+                                <span class="socketid">[{socketID}]</span>
+                            </div>
+                        )
+                    })}
+                </div>
+            </div>
+
             <br/>
+            <br/>
+
 
             {/* Options */}
             <div id="config">

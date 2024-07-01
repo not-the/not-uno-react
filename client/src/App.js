@@ -2,67 +2,28 @@ import { useState, useEffect } from 'react'
 import Game from './components/Game.js'
 import Lobby from './components/Lobby.js'
 import Toast from './components/Toast.js'
+import { store } from './Util.js'
 
 // Socket.io
 import { socket } from './socket.js';
 
-
-// Game
-const data = require('./data.json');
-
-const config = {
-    deck: "normal",
-    starting_cards: 7,
-
-    // allow_continues: false, // Offer to continue game with remaining players after someone wins
-    // require_calling_uno: false,
-    // call_penalty: 'draw',
-    // call_penalty_draw_amount: 2,
-    
-    draw_until_match: false
-}
-
-const newGame = () => {
-    return {
-        // Player-specific
-        player_num: 0,
-        // host: true,
-        
-        // State
-        // started: false,
-        // state: 'play',
-        // winner: false,
-    
-        deck: structuredClone(data.decks[config.deck]), // Deck you draw from
-        pile: [], // Played cards pile
-    
-        players: [],
-        turn: 0,
-        turn_rotation_value: 0,
-        direction: 1, // 1 is clockwise
-        draw_count: 0, // This turns number of drawn cards
-    
-        // Dev tools
-        control_everyone: true, // Currently does nothing
-        // xray: false,
-        xray: true,
-    }
-}
-
-const defaultGame = newGame();
-
-
-
+/** App */
 export default function App() {
 
     // Game
-    const [game, setGame] = useState(structuredClone(defaultGame));
+    const [game, setGame] = useState(false);
+    const [profile, setProfile] = useState({ name:"username", avatar:false });
+    const [users, setUsers] = useState({});
+
+    function startGame() {
+        socket.emit("start_game");
+    }
 
     // Menu {String}
     const [menu, setMenu] = useState("null");
     const page =
-        menu === "game" ? <Game config={config} game={game} setGame={setGame} /> : // Game
-        menu === "lobby" ? <Lobby config={config} game={game} setGame={setGame} /> : // Lobby
+        menu === "game" ? <Game game={game} setGame={setGame} /> : // Game
+        menu === "lobby" ? <Lobby game={game} setGame={setGame} startGame={startGame} /> : // Lobby
         null; // Home
 
 
@@ -71,14 +32,19 @@ export default function App() {
 
 
     const [chatCache, setChatCache] = useState([]);
-    const newChatMsg = (msg) => {
-        setChatCache(old => [...old, msg]); // Push new message
+    function newChatMsg(data) {
+        setChatCache(old => [...old, data]); // Push new message
     }
 
     const sendChat = () => {
         socket.emit("chat", { msg:chatInput });
         // newChatMsg(chatInput);
-        // setChatInput("");
+        setChatInput("");
+        document.getElementById("chat_input").value = "";
+    }
+
+    const setUsername = (value) => {
+        socket.emit("setUser", { name:value });
     }
 
     const joinRoom = () => {
@@ -118,9 +84,15 @@ export default function App() {
         // Auto join from URL
         if(window.location.hash !== '') joinRoom();
 
+        // Pre-existing username
+        let myUser = store("user_data");
+        if(myUser) {
+            socket.emit("setUser", myUser);
+        }
+
         // Receive MSG
         socket.on("chat_receive", (data) => {
-            newChatMsg(data.msg);
+            newChatMsg(data);
         });
 
         // Joined to room
@@ -134,13 +106,38 @@ export default function App() {
 
             if(window.location.hash === '') window.location.hash = `#${roomID}`;
 
-            setMenu("lobby");
+            // setMenu("lobby");
         });
 
         // Toast notification
         socket.on("toast", (data) => {
             toast(data);
         });
+
+        socket.on("gameState", data => {
+            setGame(data);
+
+            // User ID
+            // console.log(data.players, socket.id);
+            // console.log(getPnumFromSocketID(data.players, socket.id));
+            data.my_num = getPnumFromSocketID(data.players, socket.id);
+
+            console.log('players: ', data.players);
+
+            /** this also exists serverside? */
+            function getPnumFromSocketID(players, socketID) {
+                return players.findIndex(p => console.log(p.socketid, socketID));
+            }
+
+            // Set menu
+            if(data.state === 'lobby') setMenu("lobby");
+            else setMenu("game");
+        })
+
+        socket.on("assignedUserData", data => {
+            store("user_data", data);
+            setProfile(data);
+        })
 
         // Receive debug data
         socket.on("debug", data => {
@@ -155,6 +152,8 @@ export default function App() {
             socket.off("chat_receive");
             socket.off("join");
             socket.off("toast");
+            socket.off("gameState");
+            socket.off("assignedUserData");
             socket.off("debug");
             window.location.hash = '';
         }
@@ -169,20 +168,6 @@ export default function App() {
                 <button onClick={() => setMenu("game")}>Game</button>
             </nav> */}
 
-            {/* Chat test */}
-            <h1>Socket test</h1>
-            <input type="text" name="chat_input" id="chat_input" onChange={event => setChatInput(event.target.value)} onKeyDown={event => { if(event.key === "Enter") sendChat() }} />
-            <button onClick={sendChat}>Send</button>
-
-            <br/>
-            <br/>
-            <h3>Messages:</h3>
-            <div>
-                {chatCache.map((msg, index) => <p key={index}>{msg}</p>)}
-            </div>
-            <br/>
-            <br/>
-
             {/* Game */}
             <main>
                 {
@@ -195,6 +180,38 @@ export default function App() {
                     </>
                 }
             </main>
+
+            {/* Chat */}
+            <div id="chat">
+                <h3>Profile</h3>
+                <div>
+                    Name: <strong>{profile.name}</strong>
+                </div>
+
+                <input type="text" name="username_input" id="username_input" placeholder="Username"
+                    onKeyDown={event => { if(event.key === "Enter") setUsername(event.target.value) }}
+                />
+                <button onClick={() => setUsername(document.getElementById("username_input").value)}>Set</button>
+                <br/>
+                <br/>
+
+                <hr />
+                <br/>
+
+                <h3>Chat</h3>
+                <br/>
+                <div className="chat_messages">
+                    {chatCache.reverse().map((data, index) => <p key={index}>
+                        <strong>{data.user.name}</strong> {data.msg}
+                    </p>)}
+                </div>
+
+                <input type="text" name="chat_input" id="chat_input"
+                    onChange={event => setChatInput(event.target.value)}
+                    onKeyDown={event => { if(event.key === "Enter") sendChat() }}
+                />
+                <button onClick={sendChat}>Send</button>
+            </div>
 
             {/* Toasts */}
             <div id="toasts">
