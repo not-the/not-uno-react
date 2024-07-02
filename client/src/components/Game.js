@@ -1,7 +1,7 @@
-import Icon from "./Icon.js"
+// import Icon from "./Icon.js"
 import Card from "./Card.js"
-import { shuffle, repeat } from "../Util.js"
-import { useEffect, useState } from "react";
+import { shuffle, repeat, clamp } from "../Util.js"
+// import { useEffect, useState } from "react";
 import { socket } from "../socket.js";
 
 
@@ -29,22 +29,17 @@ export default function Game({ game, setGame }) {
     //     }
     // }, [])
 
-
-    // Uses modulus operator to keep value within amount
-    function clamp(value, max) {
-        return ((value % max) + max) % max;
-    }
+    // Only works with 4 players
+    const arrowRotation = (game.turn_rotation_value-1-game.my_num)*90;
 
     // Player functions
-    function drawCard(PID) {
-        socket.emit("drawCard", PID);
+    function drawCard() {
+        socket.emit("drawCard");
     }
 
     // Place card in pile and enact its effects
-    function playCard(PID, cardID) {
-        socket.emit("playCard", {
-            PID, cardID
-        })
+    function playCard(cardID) {
+        socket.emit("playCard", cardID);
     }
 
     // function runDialogAction(value) {
@@ -62,9 +57,9 @@ export default function Game({ game, setGame }) {
         <div id="game">
             <div id="game_center">
                 <div id="deck">
-                    Player {game.turn+1}'s turn<br/>
-                    Deck ({game.deck.length})
-                    <Card data={game.deck[game.deck.length-1]} onClick={() => drawCard(game.turn)} />
+                    {/* Player {game.turn+1}'s turn<br/>
+                    Deck ({game.deck.length}) */}
+                    <Card data={game.deck[game.deck.length-1]} onClick={() => drawCard()} />
                     <div className="card_stack" style={{ "height": `${game.deck.length/4}px` }} />
                 </div>
 
@@ -77,17 +72,22 @@ export default function Game({ game, setGame }) {
 
                     {/* Arrow */}
                     <div className="arrow_container">
-                        <div id="arrow" style={{ "transform": `rotate(${(game.turn_rotation_value-1-game.my_num)*90}deg)` }}>
+                        <div id="arrow" style={{ "transform": `rotate(${arrowRotation}deg)` }}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 117 116">
                                 <path id="Arrow" d="M0,58,59,0V28h58V87H59v29Z" fill="#fff"/>
                             </svg>
                         </div>
                     </div>
+
+                    {/* Extra */}
+                    <div class="turn">
+                        P{game.turn+1}
+                    </div>
                 </div>
 
                 <div id="pile">
-                    <br/>
-                    Pile ({game.pile.length})
+                    {/* <br/>
+                    Pile ({game.pile.length}) */}
 
                     <Card data={game.pile[game.pile.length-1]} />
                 </div>
@@ -95,7 +95,11 @@ export default function Game({ game, setGame }) {
 
             {/* Players */}
             {game.players.map((player, playerIndex) => {
-                const classes = `player position_${clamp(playerIndex-game.my_num, game.players.length)}`;
+                const classes = `
+                player
+                position_${clamp(playerIndex-game.my_num, game.players.length)}
+                ${playerIndex === game.my_num ? "me" : ""}
+                `;
 
                 return (
                     <div className={classes} key={playerIndex}>
@@ -106,7 +110,7 @@ export default function Game({ game, setGame }) {
                             {player.cards.map((cardData, cardIndex) => {
                                 return <Card data={cardData} key={cardIndex}
                                     owner={playerIndex} game={game}
-                                    onClick={function() { playCard(playerIndex, cardIndex) }}
+                                    onClick={playerIndex === game.my_num ? function() { playCard(cardIndex) } : undefined}
                                 />
                             })}
                         </div>

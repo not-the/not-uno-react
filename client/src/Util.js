@@ -27,5 +27,10 @@ export function repeat(func, times=1) {
     times && --times && repeat(func, times);
 }
 
+// Uses modulus operator to keep value within amount
+export function clamp(value, max) {
+    return ((value % max) + max) % max;
+}
+
 /** Stores objects using localStorage */
 export function store(key, value) { return value ? localStorage.setItem(key, JSON.stringify(value)) : JSON.parse(localStorage.getItem(key)); }

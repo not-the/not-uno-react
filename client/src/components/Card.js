@@ -37,6 +37,7 @@ export default function Card({ data=null, owner, game, rotation=0, onClick, styl
     let classes = `card${data.color === 'black' ? ' no_decorator' : ''}`;
     if(visible && game?.xray) classes += ' xrayed';
     classes += ` ${data.type}`;
+    if(owner === game?.my_num && onClick !== undefined) classes += " clickable";
 
     data.rotation ??= rotation;
 

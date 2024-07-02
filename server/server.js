@@ -194,10 +194,7 @@ class Uno {
             let tailoredGame = structuredClone(clone);
 
             // User ID
-            tailoredGame.my_num = getPnumFromSocketID(tailoredGame.players, socketID);
-            function getPnumFromSocketID(players, socketID) {
-                return players.findIndex(p => p.socketID === socketID);
-            }
+            tailoredGame.my_num = this.getPnumFromSocketID(tailoredGame.players, socketID);
 
             // Other player's cards
             for(const pnum in tailoredGame.players) {
@@ -211,6 +208,10 @@ class Uno {
         
         // Emit raw data
         // this.emit("gameState", clone);
+    }
+
+    getPnumFromSocketID(players, socketID) {
+        return players.findIndex(p => p.socketID === socketID);
     }
 
     /** Emits to game's room */
@@ -291,8 +292,10 @@ class Uno {
     }
 
 
-    drawCard(pnum) {
-        if(this.turn !== pnum) return console.warn(`[Player ${pnum}] Not your turn`);
+    drawCard(socketID) {
+        const pnum = this.getPnumFromSocketID(this.players, socketID);
+
+        if(this.turn !== pnum) return console.warn(`[Player ${pnum}] Not your turn (Currently player ${game.turn}'s turn)`);
 
         // 1 draw limit
         // if(!this.config.draw_until_match && game.draw_count > 0) {
@@ -314,8 +317,10 @@ class Uno {
         this.draw_count++;
     }
 
-    playCard(pnum, cardID) {
-        console.log(pnum);
+    playCard(socketID, cardID) {
+
+        const pnum = this.getPnumFromSocketID(this.players, socketID);
+
         if(this.turn !== pnum) {
             console.warn(`[Player ${pnum}] Not your turn`);
             return false;
@@ -375,6 +380,7 @@ class Uno {
             this.players.length
         );
         this.turn_rotation_value += turnValue;
+
         this.draw_count = 0;
     }
 }
@@ -411,7 +417,13 @@ io.on("connection", (socket) => {
     // Set user profile
     socket.on("setUser", data => setUser(data));
     function setUser(data) {
-        console.log("[setUser]: ", data);
+        if(typeof data === 'object') {
+            if(data?.name === '' || typeof data?.name !== 'string') return;
+            if(data?.name.length > 32) return socket.emit("toast", {
+                title: "Invalid username",
+                msg: `Maximum username length is 32 characters.`
+            })
+        }
 
         const existing = allusers?.[socket.id];
         allusers[socket.id] = {
@@ -511,14 +523,14 @@ io.on("connection", (socket) => {
         game.start(socket);
     })
 
-    socket.on("drawCard", PID => {
+    socket.on("drawCard", () => {
         const game = getGameByUser();
-        game.drawCard(PID);
+        game.drawCard(socket.id);
     })
 
-    socket.on("playCard", ({ PID, cardID }) => {
+    socket.on("playCard", cardID => {
         const game = getGameByUser();
-        game.playCard(PID, cardID);
+        game.playCard(socket.id, cardID);
     })
     
 
@@ -532,7 +544,7 @@ io.on("connection", (socket) => {
         console.log(`[${roomID}] ${data.user.name}: ${data.msg}`);
 
         // Broadcast
-        socket.to(roomID).emit("chat_receive", data);
+        io.to(roomID).emit("chat_receive", data);
     });
 
     // Disconnect

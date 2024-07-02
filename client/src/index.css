@@ -187,6 +187,11 @@ nav > button {
         drop-shadow( 0px  2px var(--outline-color))
         drop-shadow(6px 6px var(--outline-color));
 }
+.middle .turn {
+    margin-top: 6px;
+    font-weight: 700;
+    font-size: 24pt;
+}
 
 #arrow {
     font-size: 48pt;
@@ -255,7 +260,6 @@ nav > button {
     box-shadow: 0 5px 9px rgba(0, 0, 0, 0.8);
 
     user-select: none;
-    cursor: pointer;
     transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 .card.empty {
@@ -272,10 +276,11 @@ nav > button {
     0% { border-color: rgb(76, 216, 95); }
     100% { border-color: rgb(189, 255, 187); }
 } */
-.card:hover,
-.card:focus-visible {
-    transform: translateY(-5px) scale(1.01, 1.01);
-    box-shadow: 0 9px 9px rgba(0, 0, 0, 0.4);
+.card.clickable { cursor: pointer; }
+.card.clickable:hover,
+.card.clickable:focus-visible {
+    transform: translateY(-5px) scale(1.01, 1.01) !important;
+    box-shadow: 0 9px 9px rgba(0, 0, 0, 0.4) !important;
 }
 .card > .oval {
     --height: 70%;
@@ -551,7 +556,8 @@ nav > button {
 
 
 /* Media queries */
-@media only screen and (max-width: 1100px) {
+@media only screen and (max-width: 1100px),
+            screen and (max-height: 800px) {
     .card {
         font-size: 95px;
     }
@@ -562,6 +568,12 @@ nav > button {
         flex-direction: column;
         gap: 0;
     }
+    .card {
+        font-size: 72px;
+    }
+    .card_stack { width: 72px; }
+}
+@media only screen and (max-height: 600px) {
     .card {
         font-size: 72px;
     }
