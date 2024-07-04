@@ -9,6 +9,10 @@ export default function Lobby({ game, startGame }) {
                 <div className="cols_container media_flex">
                     {/* Left */}
                     <div className="col">
+                        <h3 className="border_shadowed">
+                            Lobby<span className="small">(Room {game.roomID})</span>
+                        </h3>
+
                         {/* Start */}
                         <button className="primary_button button_green border_shadowed" onClick={startGame}>
                             <img src="/icons/play.svg" alt="" className="border_shadowed" />
@@ -79,6 +83,7 @@ export default function Lobby({ game, startGame }) {
                             </div>
                         </div>
                     </label>
+                    <div className="decorator"/>
                 </div>
 
                 {/* Starting cards */}

@@ -94,6 +94,11 @@ img {
 .secondary_text {
     color: var(--secondary-text);
 }
+.small {
+    font-size: 12pt;
+    color: var(--secondary-text);
+    margin-left: 12px;
+}
 
 *[data-title] {
     position: relative;
@@ -257,6 +262,15 @@ nav > button {
 }
 #config > .item .desc {
     margin-left: -56px;
+}
+#config > .item .decorator {
+    position: absolute;
+    inset: 0; top: unset;
+    z-index: -1;
+
+    height: 45%;
+
+    background-color: rgba(0, 0, 0, 0.15);
 }
 
 .margin_left_auto { margin-left: auto; }
