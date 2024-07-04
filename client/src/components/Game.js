@@ -54,7 +54,7 @@ export default function Game({ game, setGame }) {
     return (
         <>
         {/* Game container */}
-        <div id="game">
+        <main id="game">
             <div id="game_center">
                 <div id="deck">
                     {/* Player {game.turn+1}'s turn<br/>
@@ -64,7 +64,7 @@ export default function Game({ game, setGame }) {
                 </div>
 
                 {/* Middle */}
-                <div className="middle">
+                <div className="middle border_shadowed">
                     {/* Rotation */}
                     <div id="rotation" style={{ "transform": `rotate(${game.turn_rotation_value*45}deg) scale(${game.direction}, 1)` }}>
                         ↻
@@ -95,14 +95,29 @@ export default function Game({ game, setGame }) {
 
             {/* Players */}
             {game.players.map((player, playerIndex) => {
+                // Classes
                 const classes = `
                 player
                 position_${clamp(playerIndex-game.my_num, game.players.length)}
                 ${playerIndex === game.my_num ? "me" : ""}
                 `;
 
+                // POSITIONING
+                const angle = clamp(
+                    (360 / (game.players.length)) + (playerIndex*90) - 90,
+                    360
+                );
+                const x = Math.cos(angle) * (window.innerWidth/2) + (window.innerWidth/2);
+                const y = Math.sin(angle) * (window.innerHeight/2) + (window.innerHeight/2);
+
+                console.log(angle);
+
                 return (
-                    <div className={classes} key={playerIndex}>
+                    <div className={classes} key={playerIndex} style={{
+                        "left": x,
+                        "bottom": y,
+                        "transform": `translateX(-50%) rotate(${angle}deg)`
+                    }}>
                         <h2>PLAYER {playerIndex+1}</h2>
 
                         {/* Cards */}
@@ -110,14 +125,17 @@ export default function Game({ game, setGame }) {
                             {player.cards.map((cardData, cardIndex) => {
                                 return <Card data={cardData} key={cardIndex}
                                     owner={playerIndex} game={game}
-                                    onClick={playerIndex === game.my_num ? function() { playCard(cardIndex) } : undefined}
+                                    onClick={playerIndex === game.my_num ?
+                                        function() { playCard(cardIndex) } :
+                                        undefined
+                                    }
                                 />
                             })}
                         </div>
                     </div>
                 )
             })}
-        </div>
+        </main>
 
         {/* Dialog */}
         {/* {dialog === 'choose_color' ?

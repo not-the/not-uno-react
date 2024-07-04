@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import Game from './components/Game.js'
+import Home from './components/Home.js'
 import Lobby from './components/Lobby.js'
+import Game from './components/Game.js'
 import Toast from './components/Toast.js'
+import Chat from './components/Chat.js'
 import { store } from './Util.js'
 
 // Socket.io
@@ -18,14 +20,6 @@ export default function App() {
     function startGame() {
         socket.emit("start_game");
     }
-
-    // Menu {String}
-    const [menu, setMenu] = useState("null");
-    const page =
-        menu === "game" ? <Game game={game} setGame={setGame} /> : // Game
-        menu === "lobby" ? <Lobby game={game} setGame={setGame} startGame={startGame} /> : // Lobby
-        null; // Home
-
 
     // Chat
     const [chatInput, setChatInput] = useState("");
@@ -80,6 +74,15 @@ export default function App() {
         // }, 6200);
     }
 
+    // Menu {String}
+    const [menu, setMenu] = useState("null");
+    const page =
+        menu === "game" ? <Game game={game} setGame={setGame} /> : // Game
+        menu === "lobby" ? <Lobby game={game} setGame={setGame} startGame={startGame} /> : // Lobby
+        <Home joinRoom={joinRoom} />; // Home
+
+
+    // Server communication
     useEffect(() => {
         // Auto join from URL
         if(window.location.hash !== '') joinRoom();
@@ -162,57 +165,21 @@ export default function App() {
 
     return (
         <>
-            {/* Debug menu */}
-            {/* <nav>
-                <button onClick={() => setMenu("home")}>Home</button>
-                <button onClick={() => setMenu("lobby")}>Lobby</button>
-                <button onClick={() => setMenu("game")}>Game</button>
-            </nav> */}
+            {/* Logo */}
+            {menu !== "game" ?
+                <h1 className="container"><img src="/LOGO@2x.png" alt="NOT UNO" id="main_logo" /></h1> :
+                null
+            }
 
-            {/* Game */}
-            <main>
-                {
-                    page ??
-                    <>
-                        <h1>Not UNO</h1>
-                        {/* <button>Create</button>
-                        <button>Join</button> */}
-                        <button onClick={joinRoom}>CREATE LOBBY</button>
-                    </>
-                }
-            </main>
+            {/* Main Content (Home/Lobby/Game/etc.) */}
+            {page}
 
             {/* Chat */}
-            <div id="chat">
-                <h3>Profile</h3>
-                <div>
-                    Name: <strong>{profile.name}</strong>
-                </div>
-
-                <input type="text" name="username_input" id="username_input" placeholder="Username"
-                    onKeyDown={event => { if(event.key === "Enter") setUsername(event.target.value) }}
-                />
-                <button onClick={() => setUsername(document.getElementById("username_input").value)}>Set</button>
-                <br/>
-                <br/>
-
-                <hr />
-                <br/>
-
-                <h3>Chat</h3>
-                <br/>
-                <div className="chat_messages">
-                    {chatCache.reverse().map((data, index) => <p key={index}>
-                        <strong>{data.user.name}</strong> {data.msg}
-                    </p>)}
-                </div>
-
-                <input type="text" name="chat_input" id="chat_input"
-                    onChange={event => setChatInput(event.target.value)}
-                    onKeyDown={event => { if(event.key === "Enter") sendChat() }}
-                />
-                <button onClick={sendChat}>Send</button>
-            </div>
+            <Chat
+                profile={profile} setUsername={setUsername}
+                chatCache={chatCache} setChatInput={setChatInput} sendChat={sendChat}
+            />
+            
 
             {/* Toasts */}
             <div id="toasts">
