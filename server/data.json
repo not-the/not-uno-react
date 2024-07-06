@@ -358,84 +358,14 @@
     ]
 },
 
+"chat_blacklist": [
 
-"names": {
-    "adjectives": [
-        "red",
-        "orange",
-        "yellow",
-        "green",
-        "blue",
-        "purple",
-        "pink",
-        "magenta",
-        "black",
-        "white",
-        "gray",
-        "tan",
-        "chartreuse",
-        "navy",
-        "burgundy",
-        "maroon",
-        "amber",
-        "aqua",
-        "beige",
+],
 
-        "striped",
-        "shiny",
-        "Opaque",
-        "bronze",
-        "silver",
-        "gold",
-
-        "slow",
-        "fast",
-        "small",
-        "big",
-        "useless",
-        "neat",
-        "grand",
-        "great",
-        "rad",
-
-        "energetic",
-        "jumpy",
-        "happy",
-        "tense",
-        "active",
-
-        "every",
-        "real",
-        "fake",
-        "genuine",
-
-        "boomer"
-    ],
-    "nouns": [
-        "Monkey",
-        "Elephant",
-        "Giraffe",
-        "Penguin",
-        "Dragon",
-        "Gator",
-        "Cicada",
-        "Lion",
-        "Bear",
-        "Wolf",
-        "Camel",
-        "Llama",
-
-        "Apple",
-        "Tangerine",
-
-        "Stapler",
-        "Balloon",
-        "Clock",
-
-        "Gamer",
-        "Bill",
-        "Belle",
-        "Greg"
-    ]
-}
+"NEEDS TO BE UPDATED IN 'clientData.json' TOO": 0,
+"avatars": [
+    "balloon",
+    "stapler",
+    "yellow"
+]
 }

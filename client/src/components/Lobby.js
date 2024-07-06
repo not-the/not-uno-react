@@ -1,4 +1,5 @@
 // import { config } from "./App"
+import User from "./User.js"
 
 export default function Lobby({ game, startGame }) {
     return (
@@ -14,7 +15,7 @@ export default function Lobby({ game, startGame }) {
                         </h3>
 
                         {/* Start */}
-                        <button className="primary_button button_green border_shadowed" onClick={startGame}>
+                        <button className="button_primary button_green border_shadowed" onClick={startGame}>
                             <img src="/icons/play.svg" alt="" className="border_shadowed" />
                             <span className="border_shadowed">
                                 START
@@ -23,14 +24,14 @@ export default function Lobby({ game, startGame }) {
                         <br/>
 
                         {/* Share */}
-                        <div className="primary_button button_lightbg border_shadowed">
+                        <div className="button_primary button_lightbg border_shadowed">
                             <img src="/icons/person.svg" alt="" className="border_shadowed" />
                             <span>
                                 <span className="border_shadowed">
                                     Invite your friends
                                 </span>
 
-                                <button className="share_button button_lightbg">
+                                <button className="button_primary share_button button_lightbg">
                                     {game.roomID}
                                 </button>
                             </span>
@@ -43,18 +44,8 @@ export default function Lobby({ game, startGame }) {
                         <div>
                             <h3 className="border_shadowed">Players</h3>
                             <div className="users_list">
-                                {Object.entries(game.usersParsed).map(([socketID, user], index) => {
-                                    return (
-                                        <div className="user" data-title={`ID: ${socketID}`} key={index}>
-                                            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="" />
-                                            <span className="crown">
-                                                {socketID === game.host ? "👑" : ""}
-                                                </span>
-                                            <span>
-                                                {user.name}
-                                            </span>
-                                        </div>
-                                    )
+                                {Object.entries(game.usersParsed).map(([, user], index) => {
+                                    return <User key={index} user={user} game={game} />
                                 })}
                             </div>
                         </div>

@@ -393,17 +393,11 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function randomName() {
-    const adjective = capitalizeFirstLetter(arrRandom(data.names.adjectives));
-    const noun = arrRandom(data.names.nouns);
-    return `${adjective} ${noun}`
-}
-
 
 // Listeners
 io.on("connection", (socket) => {
     // Set random username/avatar
-    setUser();
+    setUser(undefined, true);
     
     // Log
     console.log(`Connection: ${allusers[socket.id].name} [${socket.id}]`);
@@ -416,21 +410,40 @@ io.on("connection", (socket) => {
     
     // Set user profile
     socket.on("setUser", data => setUser(data));
-    function setUser(data) {
-        if(typeof data === 'object') {
-            if(data?.name === '' || typeof data?.name !== 'string') return;
-            if(data?.name.length > 32) return socket.emit("toast", {
+    function setUser(newUser, bypassRatelimit=false) {
+        if(typeof newUser === 'object') {
+            if(newUser?.name === '' || typeof newUser?.name !== 'string') return;
+            if(newUser?.name.length > 32) return socket.emit("toast", {
                 title: "Invalid username",
                 msg: `Maximum username length is 32 characters.`
             })
         }
 
         const existing = allusers?.[socket.id];
+
+        // Ratelimit
+        const ratelimit = (existing?.changes??0) > 100 ?
+            30000 : // 30 seconds (if user has updated themselves 100+ times)
+            500; // 0.5 seconds
+        if(
+            !bypassRatelimit &&
+            existing?.changes >= 5 &&
+            Date.now() <= (existing?.last_changed??0) + ratelimit
+        ) return socket.emit("toast", {
+            title: "Wait before trying again"
+        })
+
         allusers[socket.id] = {
-            name: data?.name ?? existing?.name ?? randomName(),
-            avatar: data?.avatar ?? existing?.avatar ?? false
+            name: newUser?.name ?? existing?.name ?? "Player",
+            avatar: newUser?.avatar ?? existing?.avatar ?? arrRandom(data.avatars),
+            socketID: socket.id,
+            changes: (existing?.changes??0) + 1,
+            last_changed: bypassRatelimit ? 0 : Date.now() // Timestamp
         }
-        socket.emit("assignedUserData", allusers[socket.id]);
+        if(!bypassRatelimit) socket.emit("assignedUserData", allusers[socket.id]);
+        // if(!bypassRatelimit) socket.emit("toast", {
+        //     title: "Profile updated"
+        // })
         getGameByUser()?.updateClients();
     }
 
@@ -454,7 +467,7 @@ io.on("connection", (socket) => {
                 roomID,
                 host: socket.id
             });
-            toastTitle = "Created game";
+            toastTitle = "Created lobby";
         }
         // Game exists and is already started
         else if(game.state !== "lobby") {
@@ -539,8 +552,10 @@ io.on("connection", (socket) => {
         if(typeof data.msg !== 'string' || data.msg.length < 1) return;
 
         const roomID = usersRooms[socket.id];
-        
         data.user = allusers[socket.id];
+        data.socketID = socket.id;
+
+        // Log
         console.log(`[${roomID}] ${data.user.name}: ${data.msg}`);
 
         // Broadcast

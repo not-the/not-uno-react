@@ -16,6 +16,10 @@
     --bg-darker: #1f4928;
     --bg-lighter: #629165;
 
+    --bg-comp: rgb(14, 72, 126);
+    --bg-comp-light: rgb(19, 83, 143);
+    --bg-comp-lighter: rgb(48, 128, 202);
+
     --text: white;
     --secondary-text: rgb(202, 211, 221);
     --link: #7ec1ff;
@@ -30,6 +34,7 @@
     --black: #000000;
 
     /* Misc */
+    --container-width: 640px;
     --shadow-color: #181854;
     --shadow-distance: 6px;
     --shadow-border: 1px;
@@ -88,9 +93,25 @@ h3 {
 h4 {
     font-size: 15pt;
 }
+h5 {
+    font-size: 13.5pt;
+    margin-bottom: 6px;
+}
+h6 {
+    font-size: 11pt;
+}
 img {
     -webkit-user-drag: none;
 }
+hr {
+    --color: var(--bg-comp-lighter);
+
+    width: 100%;
+    border: none;
+    height: 1px;
+    background-color: var(--color);
+}
+
 .secondary_text {
     color: var(--secondary-text);
 }
@@ -107,13 +128,14 @@ img {
     content: attr(data-title);
     position: absolute;
     top: calc(100% + 6px);
-    /* left: 50%; */
+    /* z-index: 1; */
 
     background-color: white;
     color: black;
     border: 3px solid var(--warm-shadow);
     padding: 9px 18px;
     border-radius: 9px;
+    font-size: 11pt;
     font-weight: 450;
 
     opacity: 0;
@@ -137,6 +159,8 @@ img {
 .underline {
     border-bottom: 5px solid white;
 }
+.fullwidth { width: 100%; }
+.cursor_pointer { cursor: pointer; }
 .small_text {
     font-size: 20pt !important;
 }
@@ -144,7 +168,7 @@ img {
 /* Container */
 .container {
     width: 100%;
-    max-width: 640px;
+    max-width: var(--container-width);
     margin: 0 auto;
     padding: 32px 20px 0;
 }
@@ -154,6 +178,9 @@ img {
 }
 .cols_container > .col {
     width: 100%;
+}
+.gap_12px {
+    gap: 12px;
 }
 
 .border_shadowed {
@@ -174,12 +201,37 @@ img {
     margin: 0 auto;
 }
 
+/* Inputs */
+input, button {
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
+}
+
+input.input_primary {
+    background-color: var(--bg-comp);
+    color: white;
+
+    width: 100%;
+    padding: 6px 9px;
+    border: 1px solid var(--bg-comp-lighter);
+    border-radius: 5px;
+}
+input.input_primary::placeholder { color: var(--bg-comp-lighter); }
+input.input_primary:focus {
+    background-color: var(--bg-comp-light);
+    border-color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    outline: none;
+}
+
 /* Button */
 button {
-    font-family: 'Rubik', Arial, Helvetica, sans-serif;
     cursor: pointer;
+
+    background-color: transparent;
+    border: none;
+    color: var(--text);
 }
-.primary_button {
+.button_primary {
     --shadow-distance: 3px;
 
     display: flex;
@@ -199,43 +251,50 @@ button {
 
     transition: filter 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
 }
-button.primary_button:hover,
-button.primary_button:focus-visible {
+button.button_primary:hover,
+button.button_primary:focus-visible {
     --shadow-distance: 5px;
     transform: translate(-1px, -1px);
     background-color: rgb(243, 251, 255);
 }
-.primary_button > * {
+.button_primary > * {
+    --shadow-color: rgba(0, 0, 0, 0.5);
     transition: filter 0.2s ease;
 }
-.primary_button > img {
+.button_primary > img {
     width: 18px;
 }
-/* .primary_button > span {
+/* .button_primary > span {
     --shadow-distance: 2px;
 } */
+
+/* Secondary */
+.button_secondary {
+    display: unset;
+    font-size: 12pt;
+    padding: 6px 24px;
+    border-width: 2px;
+    text-align: center;
+}
+.button_secondary:hover,
+.button_secondary:focus-within {
+    color: black;
+}
+
+.button_mini {
+    max-width: max-content;
+}
+
+/* Colors */
 .button_green {
     background-color: rgb(155, 202, 79);
 }
 .button_lightbg {
     background-color: var(--bg-lighter);
 }
-
-nav {
-    position: relative;
-    z-index: 1;
+.button_comp {
+    background-color: var(--bg-comp-light);
 }
-nav > button {
-    padding: 12px 24px;
-    font-size: 12pt;
-    background-color: transparent;
-    color: white;
-    border: none;
-}
-
-
-/* Inputs */
-
 
 
 
@@ -715,27 +774,240 @@ button.share_button {
 /* Chat (temporary) */
 #chat {
     position: fixed;
-    left: 24px;
-    bottom: 24px;
-    background-color: rgb(35, 59, 82);
-    padding: 12px 18px;
-    border-radius: 6px;
-    border: 1px solid gray;
+    left: 0;
+    bottom: 0;
+
+    background-color: var(--bg-comp);
+    border: 1px solid var(--bg-comp-lighter);
+    padding: 12px 18px 18px 28px;
+    border-radius: 0 6px 6px 0;
+    border-left: none;
 
     width: 100%;
-    max-width: 340px;
+    max-width: 360px;
+    height: 100%;
+    max-height: 600px;
+
+    transform: translateX(calc(-100% - 18px));
+    transition: transform 0.35s cubic-bezier(.42,0,.17,1.17);
+}
+#chat hr { --color: var(--bg-comp-lighter); }
+#chat .chat_unavailable {
+    text-align: center;
+    padding-top: 24px;
+}
+#chat .close {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 18pt;
+    padding: 2px 10px
+}
+.open > #chat {
+    transform: translateX(-10px);
+}
+.open > #chat_button {
+    transform: translateX(48px) rotate(45deg);
+    opacity: 0;
+    pointer-events: none;
 }
 .chat_messages {
-    max-height: min(100vh, 220px);
+    max-height: min(100vh, 410px);
     overflow-y: auto;
     display: flex;
     flex-direction: column-reverse;
+    gap: 9px;
 }
 .chat_messages > p {
     border-top: 1px solid gray;
     padding: 2px 0;
 }
 
+/* Chat bar */
+#chat .chat_bottom {
+    position: absolute;
+    left: 28px;
+    bottom: 18px;
+    right: 18px;
+    display: flex;
+    gap: 6px;
+
+    background-color: var(--bg-comp);
+    border: 1px solid var(--bg-comp-lighter);
+    padding: 6px 9px;
+
+    border-radius: 5px;
+}
+#chat .chat_bottom:focus-within {
+    background-color: var(var(--bg-comp-light));
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+#chat .chat_bottom input {
+    background-color: transparent;
+    border: none;
+    color: var(--text);
+    padding-left: 3px;
+    font-size: 11pt;
+    /* outline: 1px solid red; */
+
+    width: 100%;
+}
+#chat .chat_bottom input:focus {
+    outline: none;
+}
+#chat .chat_bottom input::placeholder { color: var(--bg-comp-lighter); }
+#chat .chat_bottom > button {
+    /* outline: 1px solid greenyellow; */
+    width: 48px;
+}
+#chat .chat_bottom > button > svg {
+    width: 18px;
+    vertical-align: middle;
+}
+#chat .chat_bottom > button > svg > path {
+    transition: 0.1s fill ease;
+    fill: var(--bg-comp-lighter);
+}
+#chat .chat_bottom > button.message_ready > svg > path {
+    fill: var(--text);
+}
+
+#chat_button {
+    --shadow-distance: 4px;
+
+    position: fixed;
+    bottom: 48px;
+    left: 24px;
+
+    background-color: var(--bg-comp);
+    padding: 12px;
+    border: 2px solid var(--bg-comp-lighter);
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    transition: 0.1s filter ease, opacity 0.3s ease, transform 0.3s ease;
+}
+#chat_button:hover,
+#chat_button:focus-visible {
+    --shadow-distance: 6px;
+    transform: translate(-1px, -1px);
+    /* --shadow-color: var(--bg-comp-lighter);
+    border-color: white; */
+}
+#chat_button > img {
+    height: 32px;
+    width: 32px;
+    transform: translateY(3px);
+    transition: transform 0.3s cubic-bezier(.34,1.19,.46,1.62);
+}
+#chat_button > span {
+    position: absolute;
+    font-size: 16pt;
+    font-weight: 700;
+    color: var(--bg-comp);
+    transition: transform 0.3s cubic-bezier(.34,1.19,.46,1.62);
+}
+#chat_button:hover > img,
+#chat_button:focus-visible > img {
+    transform: translateY(-1px) rotate(-12deg);
+}
+#chat_button:hover > span,
+#chat_button:focus-visible > span {
+    transform: translateY(-4px) rotate(-12deg);
+}
+.bubble {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 32px);
+
+    text-align: left;
+    font-size: 11pt;
+
+    width: max-content;
+    max-width: 95vw;
+    padding: 6px 12px;
+    /* border-radius: 5px; */
+
+    background-color: white;
+    color: black;
+
+    animation: bubble 0.3s ease;
+}
+@keyframes bubble {
+    from {
+        transform: translateY(5px) rotate(1deg);
+    }
+}
+.bubble::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 16px;
+
+    width: 0; 
+    height: 0; 
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    
+    border-top: 12px solid white;
+}
+.bubble strong {
+    padding-right: 9px;
+}
+
+
+/* Profile dialog */
+.dialog {
+    --bg-comp: rgb(46, 47, 117);
+    --bg-comp-light: rgb(59, 61, 143);
+    --bg-comp-lighter: rgb(100, 102, 216);
+
+    width: 100%;
+    max-width: 440px;
+    padding: 12px 18px;
+
+    background-color: var(--bg-comp);
+    border: 1px solid var(--bg-comp-lighter);
+    border-radius: 5px;
+}
+#profile {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+}
+.avatar_list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+.avatar_preview {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border: 2px solid var(--shadow-color);
+    border-radius: 5px;
+}
+.avatar_preview:hover,
+.avatar_preview:focus-visible {
+    border-color: white;
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.1s ease;
+}
+body:has(#profile) .backdrop {
+    opacity: 1;
+    pointer-events: initial;
+}
 
 /* Users */
 .users_list {
@@ -746,7 +1018,8 @@ button.share_button {
 .user {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
+    text-align: left;
 
     border-radius: 10px;
 
@@ -762,9 +1035,12 @@ button.share_button {
     height: 36px;
     border-radius: 100%;
 }
-.user > span {
-    font-weight: 500;
+.user .name {
+    font-weight: 600;
     font-size: 15pt;
+}
+.user .name.small_name {
+    font-size: 11pt;
 }
 .user .socketid {
     font-size: 10pt;
@@ -776,6 +1052,15 @@ button.share_button {
     left: -8px;
     transform: rotate(-22deg);
     font-size: 16pt;
+}
+.user .message {
+    white-space: pre;
+    font-weight: 450;
+    color: var(--secondary-text);
+}
+
+.profile_button {
+    border-radius: 200px;
 }
 
 
@@ -813,4 +1098,12 @@ button.share_button {
         font-size: 72px;
     }
     .card_stack { width: 72px; }
+}
+
+
+/* Columns */
+@media only screen and (max-width: 640px) {
+    .media_flex {
+        flex-direction: column;
+    }
 }

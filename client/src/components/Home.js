@@ -4,7 +4,7 @@ export default function Home({ joinRoom }) {
             {/* Main */}
             <main id="home" className="container">
                 {/* Buttons */}
-                <button className="primary_button border_shadowed" onClick={joinRoom}>
+                <button className="button_primary border_shadowed" onClick={joinRoom}>
                     <span className="border_shadowed">
                         CREATE LOBBY
                     </span>

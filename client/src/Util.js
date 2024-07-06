@@ -34,3 +34,11 @@ export function clamp(value, max) {
 
 /** Stores objects using localStorage */
 export function store(key, value) { return value ? localStorage.setItem(key, JSON.stringify(value)) : JSON.parse(localStorage.getItem(key)); }
+
+export function arrRandom(arr) {
+    return arr[Math.floor(Math.random()*arr.length)]
+}
+
+export function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
