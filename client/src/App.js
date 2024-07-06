@@ -177,7 +177,8 @@ export default function App() {
             // }
 
             // Set menu
-            if(data.state === 'lobby') setMenu("lobby");
+            if(data === false) setMenu(null);
+            else if(data.state === 'lobby') setMenu("lobby");
             else setMenu("game");
         })
 
@@ -276,9 +277,9 @@ export default function App() {
                     {/* Avatar */}
                     <h5>Avatar</h5>
                     <div className="avatar_list">
-                        {clientData.avatars.map(name => {
+                        {clientData.avatars.map((name, index) => {
                             return (
-                                <button data-title={capitalizeFirstLetter(name)}
+                                <button data-title={capitalizeFirstLetter(name)} key={index}
                                     onClick={() => setUser(undefined, name)}
                                 >
                                     <img src={`/avatars/${name}.png`} alt={name} className="avatar_preview" />

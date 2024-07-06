@@ -22,7 +22,7 @@ export default function Chat({
 
             {/* Edit profile */}
             <button className="profile_button button_comp fullwidth" onClick={() => setProfileOpen(true)}>
-                <User user={profile} message={"Click to customize..."} title={false} />
+                <User user={profile} message={"Click to customize..."} />
             </button>
 
             <hr />

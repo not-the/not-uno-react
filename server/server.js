@@ -137,15 +137,7 @@ class Uno {
         this.state = 'lobby';
         this.winner = false;
 
-        this.deck = structuredClone(data.decks[this.config.deck]), // Deck you draw from
-        this.pile = []; // Played cards pile
-
         this.players = [];
-        this.playerMap = {}; // key:value = socketID:playerNumber
-        this.turn = 0;
-        this.turn_rotation_value = 0;
-        this.direction = 1; // 1 is clockwise
-        this.draw_count = 0; // This turns number of drawn cards
 
         // Dev tools
         this.control_everyone = true; // Currently does nothing
@@ -154,16 +146,6 @@ class Uno {
 
         // Register game
         allgames[roomID] = this;
-
-
-        // Setup
-        hideAll(this.deck, false);
-        shuffle(this.deck); // Shuffle
-
-        // this.addPlayer(); // Player
-        // this.addPlayer(); // Player
-
-        this.moveCard("deck", "pile", false); // First card
 
         // Update
         this.updateClients();
@@ -225,6 +207,23 @@ class Uno {
             socket.emit("toast", { msg: "Only the host can start the game" });
             return;
         };
+
+        // Setup
+        this.deck = structuredClone(data.decks[this.config.deck]), // Deck you draw from
+        this.pile = []; // Played cards pile
+
+        this.turn = 0;
+        this.turn_rotation_value = 0;
+        this.direction = 1; // 1 is clockwise
+        this.draw_count = 0; // This turns number of drawn cards
+
+        hideAll(this.deck, false);
+        shuffle(this.deck); // Shuffle
+
+        // this.addPlayer(); // Player
+        // this.addPlayer(); // Player
+
+        this.moveCard("deck", "pile", false); // First card
 
         // if(this.players.length < 2) return console.warn("Not enough players");
         this.state = "ingame";
@@ -533,7 +532,28 @@ io.on("connection", (socket) => {
     // Start game
     socket.on("start_game", data => {
         const game = getGameByUser();
+        if(game === undefined) {
+            console.warn(`Warning: Game is undefined. User: [${socket.id}]`);
+            socket.emit("toast", {
+                title: "Error",
+                msg: "Game does not exist. Try making another one."
+            })
+            socket.emit("gameState", false);
+            return;
+        }
         game.start(socket);
+    })
+
+    socket.on("update_config", ({ option, value }) => {
+        const game = getGameByUser();
+        if(game === undefined || typeof option !== 'string') return;
+
+        if(game.config.hasOwnProperty(option)) {
+            if(typeof value !== typeof game.config[option]) return;
+
+            game.config[option] = value;
+            game.updateClients();
+        }
     })
 
     socket.on("drawCard", () => {
@@ -545,7 +565,6 @@ io.on("connection", (socket) => {
         const game = getGameByUser();
         game.playCard(socket.id, cardID);
     })
-    
 
     // Chat message
     socket.on("chat", (data) => {

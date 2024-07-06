@@ -66,7 +66,7 @@ body {
         var(--bg-b) 90px
     ); */
 
-    width: 100vw;
+    width: 100%;
     height: 100vh;
 }
 
@@ -156,11 +156,13 @@ hr {
 .flex {
     display: flex;
 }
+.flex_important { display: flex !important; }
 .underline {
     border-bottom: 5px solid white;
 }
 .fullwidth { width: 100%; }
 .cursor_pointer { cursor: pointer; }
+.float_right { float: right; }
 .small_text {
     font-size: 20pt !important;
 }
@@ -183,7 +185,9 @@ hr {
     gap: 12px;
 }
 
-.border_shadowed {
+.border_shadowed,
+.hover_border_shadowed:hover,
+.hover_border_shadowed:focus-visible {
     filter:
         drop-shadow(-1px -1px var(--shadow-color))
         drop-shadow(-1px  1px var(--shadow-color))
@@ -299,7 +303,13 @@ button.button_primary:focus-visible {
 
 
 /* Lobby */
+#config {
+    padding-bottom: 200px;
+}
 #config > .item {
+    --bg-comp: var(--bg-lighter);
+    --shadow-color: rgba(0, 0, 0, 0.5);
+
     padding: 12px 24px 12px 80px;
 
     background-color: var(--bg-lighter);
@@ -330,6 +340,41 @@ button.button_primary:focus-visible {
     height: 45%;
 
     background-color: rgba(0, 0, 0, 0.15);
+}
+
+#config > .item .input_container {
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: var(--bg-main);
+    border: 6px solid var(--bg-lighter);
+
+    display: flex;
+    gap: 2px;
+}
+#config > .item input,
+#config > .item button {
+    min-width: 36px;
+    font-size: 14pt;
+    text-align: center;
+
+    background-color: var(--bg-lighter);
+    color: white;
+    border: none;
+}
+#config > .item input {
+    min-width: 64px;
+}
+
+/* REMOVE INPUT ARROWS */
+/* Chrome, Safari, Edge, Opera */
+#config > .item input::-webkit-outer-spin-button,
+#config > .item input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+#config > .item input[type=number] {
+  -moz-appearance: textfield;
 }
 
 .margin_left_auto { margin-left: auto; }
@@ -812,7 +857,7 @@ button.share_button {
     pointer-events: none;
 }
 .chat_messages {
-    max-height: min(100vh, 410px);
+    max-height: min(calc(100vh - 174px), 430px);
     overflow-y: auto;
     display: flex;
     flex-direction: column-reverse;

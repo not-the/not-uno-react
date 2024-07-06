@@ -1,6 +1,6 @@
 export default function User({ user, game, message, title }) {
     return (
-        <div className={`user${message?" user_message":""}`} data-title={title === false ? null : `ID: ${user.socketID}`}>
+        <div className={`user${message?" user_message":""}`} data-title={title}>
             {/* Avatar */}
             <img src={`/avatars/${user.avatar}.png`} alt="" />
 
