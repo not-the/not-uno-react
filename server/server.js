@@ -122,7 +122,10 @@ class Uno {
             // call_penalty: 'draw',
             // call_penalty_draw_amount: 2,
         
-            draw_until_match: false
+            draw_until_match: false,
+
+            chat: true,
+            xray: false
         }
 
         // Data
@@ -141,8 +144,6 @@ class Uno {
 
         // Dev tools
         this.control_everyone = true; // Currently does nothing
-        this.xray = false;
-        // this.xray = true;
 
         // Register game
         allgames[roomID] = this;
@@ -158,6 +159,39 @@ class Uno {
         let users = {};
         for(const PID of this.playersBySocket) users[PID] = allusers[PID];
         return users;
+    }
+
+    leave(socket, sendtoast) {
+        const roomID = this.roomID;
+
+        // Remove player from game
+        delete this.players[this.getPnumFromSocketID(this.players, socket.id)];
+
+        // Re-register user as being in room
+        delete usersRooms[socket.id];
+        socket.leave(roomID);
+
+        // Tell room someone left
+        socket.to(roomID).emit("toast", {
+            msg: `User [${socket.id}] left!`
+        })
+
+        // Tell user they left
+        if(sendtoast) socket.emit("toast", {
+            title: "Left game",
+            msg: `Room ID: "${roomID}"`
+        });
+
+        // All players have left
+        if(this.players.length === 0) {
+            console.log(`Room [${roomID}] is empty, closing game...`);
+            delete allgames[roomID]; // Delete self
+        }
+
+        // Transfer ownership to remaining player
+        else if(socket.id === this.host) this.host = this.playersBySocket[0];
+
+        this.updateClients();
     }
 
     /** Send game state to clients */
@@ -179,9 +213,11 @@ class Uno {
             tailoredGame.my_num = this.getPnumFromSocketID(tailoredGame.players, socketID);
 
             // Other player's cards
-            for(const pnum in tailoredGame.players) {
-                console.log(pnum, tailoredGame.my_num);
-                if(pnum != tailoredGame.my_num) hideAll(tailoredGame.players[pnum].cards, true);
+            if(!this.config.xray) {
+                for(const pnum in tailoredGame.players) {
+                    console.log(pnum, tailoredGame.my_num);
+                    if(pnum != tailoredGame.my_num) hideAll(tailoredGame.players[pnum].cards, true);
+                }
             }
 
             // Emit
@@ -193,7 +229,7 @@ class Uno {
     }
 
     getPnumFromSocketID(players, socketID) {
-        return players.findIndex(p => p.socketID === socketID);
+        return players.findIndex(p => p?.socketID === socketID);
     }
 
     /** Emits to game's room */
@@ -203,10 +239,17 @@ class Uno {
 
     /** Starts the game (host only) */
     start(socket) {
+        // Host
         if(socket.id !== this.host) {
             socket.emit("toast", { msg: "Only the host can start the game" });
             return;
         };
+
+        // Minimum players
+        // if(this.players.length < 2) {
+        //     socket.emit("toast", { msg: "Not enough players" });
+        //     return;
+        // }
 
         // Setup
         this.deck = structuredClone(data.decks[this.config.deck]), // Deck you draw from
@@ -220,14 +263,12 @@ class Uno {
         hideAll(this.deck, false);
         shuffle(this.deck); // Shuffle
 
-        // this.addPlayer(); // Player
-        // this.addPlayer(); // Player
-
         this.moveCard("deck", "pile", false); // First card
+        this.generatePlayers();
 
         // if(this.players.length < 2) return console.warn("Not enough players");
         this.state = "ingame";
-        this.generatePlayers();
+
         this.updateClients();
     }
 
@@ -406,6 +447,11 @@ io.on("connection", (socket) => {
         const roomID = data ?? getRoomUUID();
         joinRoom(roomID);
     })
+
+    socket.on("leave", () => {
+        getGameByUser()?.leave(socket, true);
+        socket.emit("gameState", false);
+    });
     
     // Set user profile
     socket.on("setUser", data => setUser(data));
@@ -449,11 +495,11 @@ io.on("connection", (socket) => {
     // Join room handler
     function joinRoom(roomID) {
         // ID is not a string or too long
-        if(typeof roomID !== 'string' || roomID.length > 32) {
+        if(typeof roomID !== 'string' || roomID.length < 4 || roomID.length > 32) {
             console.warn(`Failed trying to join room: User ID ${socket.id}`);
             socket.emit("toast", {
                 title: "Error",
-                msg: `Failed trying to join room. Maximum length is 32 characters.`
+                msg: `Failed trying to join room. Must be between 4 and 32 characters.`
             });
             return;
         };
@@ -478,7 +524,7 @@ io.on("connection", (socket) => {
         }
 
         // Leave all other rooms
-        for(const r of socket.rooms) leaveRoom(r, false);
+        for(const r of socket.rooms) allgames[r]?.leave(socket, false);
         
         // Rejoin personal room
         socket.join(socket.id);
@@ -500,33 +546,6 @@ io.on("connection", (socket) => {
         });
 
         game.updateClients();
-    }
-
-    function leaveRoom(roomID, sendtoast=true) {
-        console.log(roomID,  ' participants: ', getRoomUsers(roomID))
-
-        let game = allgames[roomID];
-        if(game !== undefined) {
-            // All players have left
-            if(game.playersBySocket.length === 0) {
-                console.log(`Room [${roomID}] is empty, closing game...`);
-                delete allgames[roomID];
-            }
-        }
-
-        delete usersRooms[socket.id];
-        socket.leave(roomID);
-
-        // Tell room someone left
-        socket.to(roomID).emit("toast", {
-            msg: `User [${socket.id}] left!`
-        })
-
-        // Tell user they left
-        if(sendtoast) socket.emit("toast", {
-            title: "Left game",
-            msg: `Room ID: "${roomID}"`
-        });
     }
 
     // Start game
@@ -585,10 +604,11 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         console.log(`Disconnected: ${socket.id}`);
         console.log(socket.id);
-        leaveRoom(usersRooms[socket.id]);
+
+        getGameByUser()?.leave(socket);
 
         // De-register
-        // delete allusers[socket.id];
+        delete allusers[socket.id];
     });
 
 

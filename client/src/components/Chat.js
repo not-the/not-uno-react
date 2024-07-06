@@ -29,21 +29,31 @@ export default function Chat({
             <br/>
             <div className="chat_messages">
                 {
+                    // Not in-game
                     game === false ?
                     <div className="chat_unavailable secondary_text">
                         Start or join a game
                     </div> :
+
+                    // Chat is disabled
+                    !game?.config?.chat ?
+                    <div className="chat_unavailable secondary_text">
+                        Chat is disabled
+                    </div> :
+
+                    // Messages
                     chatCache.map((data, index) => <div className="msg" key={index}>
                         <User user={game.usersParsed[data.socketID]} message={data.msg} />
                     </div>)
                 }
             </div>
 
-            <div className="chat_bottom">
+            <div className="chat_bottom" aria-disabled={!game?.config?.chat}>
                 <input type="text" name="chat_input" id="chat_input"
                     placeholder="Send a message..."
                     onChange={event => setChatInput(event.target.value)}
                     onKeyDown={event => { if(event.key === "Enter") sendChat() }}
+                    disabled={!game?.config?.chat}
                 />
                 <button
                     onClick={sendChat}

@@ -80,7 +80,7 @@ export default function Game({ game, setGame }) {
                     </div>
 
                     {/* Extra */}
-                    <div class="turn">
+                    <div className="turn">
                         P{game.turn+1}
                     </div>
                 </div>
@@ -103,21 +103,26 @@ export default function Game({ game, setGame }) {
                 `;
 
                 // POSITIONING
-                const angle = clamp(
-                    (360 / (game.players.length)) + (playerIndex*90) - 90,
-                    360
-                );
-                const x = Math.cos(angle) * (window.innerWidth/2) + (window.innerWidth/2);
-                const y = Math.sin(angle) * (window.innerHeight/2) + (window.innerHeight/2);
+                // const angle = clamp(
+                //     (360 / (game.players.length)) + (playerIndex*90) - 90,
+                //     360
+                // );
+                // const x = Math.cos(angle) * (window.innerWidth/2) + (window.innerWidth/2);
+                // const y = Math.sin(angle) * (window.innerHeight/2) + (window.innerHeight/2);
+                // const styles = {
+                //     "left": x,
+                //     "bottom": y,
+                //     "transform": `translateX(-50%) rotate(${angle}deg)`
+                // };
 
-                console.log(angle);
+                // console.log(angle);
+
+                const styles = undefined;
+
+
 
                 return (
-                    <div className={classes} key={playerIndex} style={{
-                        "left": x,
-                        "bottom": y,
-                        "transform": `translateX(-50%) rotate(${angle}deg)`
-                    }}>
+                    <div className={classes} key={playerIndex} style={styles}>
                         <h2>PLAYER {playerIndex+1}</h2>
 
                         {/* Cards */}

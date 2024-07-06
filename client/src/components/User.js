@@ -1,4 +1,8 @@
+// import { socket } from "../socket"
+
 export default function User({ user, game, message, title }) {
+    // const isMe = user.socketID === socket.id;
+
     return (
         <div className={`user${message?" user_message":""}`} data-title={title}>
             {/* Avatar */}

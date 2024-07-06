@@ -116,7 +116,7 @@ export default function App() {
     const page =
         menu === "game" ? <Game game={game} setGame={setGame} /> : // Game
         menu === "lobby" ? <Lobby game={game} setGame={setGame} startGame={startGame} /> : // Lobby
-        menu === "joining" ? <Joining game={game} /> : // Lobby
+        menu === "joining" ? <Joining game={game} setMenu={setMenu} /> : // Lobby
     <Home joinRoom={joinRoom} />; // Home
 
     const [profileOpen, setProfileOpen] = useState(false);
@@ -151,8 +151,6 @@ export default function App() {
             }
 
             if(window.location.hash === '') window.location.hash = `#${roomID}`;
-
-            // setMenu("lobby");
         });
 
         // Toast notification
@@ -177,7 +175,10 @@ export default function App() {
             // }
 
             // Set menu
-            if(data === false) setMenu(null);
+            if(data === false) {
+                setMenu(null);
+                window.location.hash = "";
+            }
             else if(data.state === 'lobby') setMenu("lobby");
             else setMenu("game");
         })
@@ -267,7 +268,21 @@ export default function App() {
                                 placeholder="Username"
                                 onKeyDown={event => { if(event.key === "Enter") setUser(event.target.value) }}
                             />
-                            <button className="button_primary button_secondary button_comp button_mini" onClick={() => setUser(document.getElementById("username_input").value)}>
+
+                            {/* Random username */}
+                            <button
+                                className="button_primary button_secondary button_comp button_micro"
+                                onClick={() => document.getElementById("username_input").value = randomName()}
+                                data-title="Random"
+                            >
+                                <img src="/icons/casino_24dp_E8EAED_FILL1_wght400_GRAD200_opsz20.svg" alt="Random" />
+                            </button>
+
+                            {/* Set */}
+                            <button
+                                className="button_primary button_secondary button_comp button_mini"
+                                onClick={() => setUser(document.getElementById("username_input").value)}
+                            >
                                 Set
                             </button>
                         </div>
@@ -319,8 +334,18 @@ export default function App() {
 }
 
 
-function Joining({ game }) {
+function Joining({ game, setMenu }) {
     return (
-        <h2 className="container border_shadowed">Joining...</h2>
+        <div className="container">
+            <h2 className="border_shadowed">Joining...</h2>
+            <br/>
+
+            <button
+                className="button_primary button_secondary button_lightbg hover_border_shadowed"
+                onClick={() => setMenu(false)}
+            >
+                Cancel
+            </button>
+        </div>
     )
 }

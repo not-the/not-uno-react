@@ -12,7 +12,7 @@ export default function Card({ data=null, owner, game, rotation=0, onClick, styl
     // Card back
     // let visible = (data.hidden || (owner !== game?.my_num));
     let visible = data.hidden;
-    if(visible && !game?.xray) return (
+    if(visible && !game?.config?.xray) return (
             <div className="card back" onClick={onClick} tabIndex="0" role="button">
                 <div className="oval"/>
                 <Icon icon="NOPE" />
@@ -35,7 +35,7 @@ export default function Card({ data=null, owner, game, rotation=0, onClick, styl
 
     // CSS
     let classes = `card${data.color === 'black' ? ' no_decorator' : ''}`;
-    if(visible && game?.xray) classes += ' xrayed';
+    if(visible && game?.config?.xray) classes += ' xrayed';
     classes += ` ${data.type}`;
     if(owner === game?.my_num && onClick !== undefined) classes += " clickable";
 
