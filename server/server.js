@@ -11,8 +11,12 @@ const data = require('./data.json');
 const cors = require("cors");
 app.use(cors());
 
+const privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
+const certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+
 /** Express server instance */
-const server = https.createServer(app);
+const server = https.createServer(credentials, app);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
