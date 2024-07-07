@@ -3,6 +3,7 @@
 // Dependencies
 const express = require("express");
 const app = express();
+const fs = require("fs");
 const https = require("https");
 const { Server } = require("socket.io");
 const data = require('./data.json');
