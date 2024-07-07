@@ -18,9 +18,10 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         // Frontend origin
-        // origin: "http://localhost:3000",
-        origin: "*",
-        // methods: ["GET", "POST"]
+        origin: process.env.NODE_ENV === 'production' ?
+            "https://uno.notkal.com" :  // Production website
+            'http://localhost:3000',    // Development
+        methods: ["GET", "POST"]
     }
 });
 
