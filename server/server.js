@@ -16,6 +16,8 @@ const server = http.createServer(app);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+console.log(`Starting...\nProduction environment: ${isProduction}`);
+
 /** Socket.io */
 const io = new Server(server, {
     cors: {
