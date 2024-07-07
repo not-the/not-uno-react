@@ -292,7 +292,7 @@ button.button_primary:not([disabled]):focus-visible {
     text-align: center;
 }
 .button_secondary:hover,
-.button_secondary:focus-within {
+.button_secondary:focus-visible {
     color: black;
 }
 
