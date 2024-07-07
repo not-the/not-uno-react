@@ -12,8 +12,8 @@ const data = require('./data.json');
 const cors = require("cors");
 app.use(cors());
 
-const privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
-const certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+const privateKey  = fs.readFileSync('./ssl/server.key', 'utf8');
+const certificate = fs.readFileSync('./ssl/server.cert', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 
 /** Express server instance */
