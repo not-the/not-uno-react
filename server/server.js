@@ -14,11 +14,13 @@ app.use(cors());
 /** Express server instance */
 const server = http.createServer(app);
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 /** Socket.io */
 const io = new Server(server, {
     cors: {
         // Frontend origin
-        origin: process.env.NODE_ENV === 'production' ?
+        origin: isProduction ?
             "https://uno.notkal.com" :  // Production website
             'http://localhost:3000',    // Development
         methods: ["GET", "POST"]
@@ -614,7 +616,7 @@ io.on("connection", (socket) => {
 
 
     // Debug
-    socket.on("debug", (data) => {
+    if(!isProduction) socket.on("debug", (data) => {
         socket.emit("debug", {
             usersRooms,
             allgames,

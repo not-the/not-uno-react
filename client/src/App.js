@@ -8,7 +8,7 @@ import User from './components/User.js'
 import { store, arrRandom, capitalizeFirstLetter } from './Util.js'
 
 // Socket.io
-import { socket } from './socket.js'
+import { socket, isProduction } from './socket.js'
 
 // Game
 const clientData = require('./clientData.json');
@@ -322,12 +322,14 @@ export default function App() {
                 {toasts.map((t, index) => <Toast data={t} key={index} />)}
 
                 {/* Debug tools */}
-                <button onClick={debugDataRequest}>Request server data</button>
-                <div>
-                    <strong>debug:</strong><br/>
-                    pnum: {game?.my_num}<br/>
-                    socketID: {socket?.id}
-                </div>
+                {!isProduction ? <>
+                    <button onClick={debugDataRequest}>Request server data</button>
+                    <div>
+                        <strong>debug:</strong><br/>
+                        pnum: {game?.my_num}<br/>
+                        socketID: {socket?.id}
+                    </div>
+                </> : null}
             </div>
         </>
     );
