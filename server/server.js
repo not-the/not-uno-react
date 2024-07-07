@@ -3,7 +3,7 @@
 // Dependencies
 const express = require("express");
 const app = express();
-const http = require("http");
+const https = require("https");
 const { Server } = require("socket.io");
 const data = require('./data.json');
 
@@ -12,7 +12,7 @@ const cors = require("cors");
 app.use(cors());
 
 /** Express server instance */
-const server = http.createServer(app);
+const server = https.createServer(app);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
