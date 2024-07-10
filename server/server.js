@@ -20,16 +20,22 @@ var credentials = {key: privateKey, cert: certificate};
 const server = https.createServer(credentials, app);
 
 const isProduction = process.env.NODE_ENV === 'production';
+const clientOrigin = isProduction ?
+    "https://uno.notkal.com" :  // Production website
+    'https://localhost:3000';    // Development
 
-console.log(`Starting...\nProduction environment: ${isProduction}`);
+console.log(
+`
+\x1b[47m\x1b[30m  Starting Not UNO server...  \x1b[0m
+> Environment: \x1b[33m${isProduction ? 'production' : 'dev'}\x1b[0m
+> Client origin: \x1b[33m${clientOrigin}\x1b[0m
+`);
 
 /** Socket.io */
 const io = new Server(server, {
     cors: {
         // Frontend origin
-        origin: isProduction ?
-            "https://uno.notkal.com" :  // Production website
-            'http://localhost:3000',    // Development
+        origin: clientOrigin,
         methods: ["GET", "POST"]
     }
 });
@@ -643,5 +649,5 @@ io.on("connection", (socket) => {
 // const port = 3001;
 const port = 8080;
 server.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+    console.log(`Listening on port \x1b[36m${port}`);
 })
