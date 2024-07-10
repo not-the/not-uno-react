@@ -27,4 +27,4 @@ jobs:
       run: npm install
 
     - name: Run production server
-      run: pm2 start "npm run prod" --name not-uno-server
+      run: pm2 start "npm run prod" --name not-uno-server && pm2 logs
