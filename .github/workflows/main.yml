@@ -18,5 +18,6 @@ jobs:
       with:
         node-version: 20.x
     - run: cd ./server
+    - run: npm install
     - run: npm run prod
     - run: pm2 restart not-uno-server
