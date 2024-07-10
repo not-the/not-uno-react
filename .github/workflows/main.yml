@@ -28,4 +28,4 @@ jobs:
 
     - name: Run production server
       working-directory: ./server
-      run: pm2 start "npm run prod" --name not-uno-server --no-daemon
+      run: pm2 start "npm run prod" --name not-uno-server
