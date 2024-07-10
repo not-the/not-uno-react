@@ -26,4 +26,4 @@ jobs:
       working-directory: ./server
       run: npm run prod
 
-    - run: pm2 restart not-uno-server
+    # - run: pm2 restart not-uno-server
