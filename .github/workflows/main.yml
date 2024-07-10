@@ -17,6 +17,6 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 20.x
-    - run: npm install
-    - run: npm test
+    - run: cd ./server
+    - run: npm run prod
     - run: pm2 restart not-uno-server

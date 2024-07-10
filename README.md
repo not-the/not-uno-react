@@ -9,14 +9,14 @@ npm start
 
 # Server
 
-Run dev server:
+Run server:
 ```bash
+# Development server
 cd ./server
 npm start
-```
 
-Run production server:
-```bash
-# Make sure to set NODE_ENV to 'production'
+# Production server
+# NODE_ENV is automatically set to 'production' using the 'cross-env' package
+cd ./server
 npm run prod
 ```
