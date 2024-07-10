@@ -6,6 +6,9 @@ import Config from "./Config.js"
 
 export default function Lobby({ game, startGame }) {
 
+    const playerMax = 4;
+    const playerCount = Object.keys(game.usersParsed).length;
+
     function shareRoom() {
         // URL PLACEHOLDER
         window.navigator.share({
@@ -76,7 +79,15 @@ export default function Lobby({ game, startGame }) {
                     <div className="col" style={{ "maxWidth": "300px" }}>
                         {/* Players */}
                         <div>
-                            <h3 className="border_shadowed">Players</h3>
+                            {/* Title */}
+                            <div className="flex flex_center_vertically">
+                                <h3 className="border_shadowed">Players</h3>
+                                <h4 className={`player_count margin_left_auto${playerCount >= playerMax ? " full border_shadowed" : ""}`}>
+                                    {playerCount}/{playerMax}
+                                </h4>
+                            </div>
+
+                            {/* List */}
                             <div className="users_list">
                                 {Object.entries(game.usersParsed).map(([, user], index) => {
                                     return <User
@@ -101,7 +112,7 @@ export default function Lobby({ game, startGame }) {
                 <Config name="xray" game={game} />
 
                 {/* Chat */}
-                <Config name="chat" game={game} />
+                <Config name="enable_chat" game={game} />
             </div>
         </>
     )

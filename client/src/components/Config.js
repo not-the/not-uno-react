@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { socket } from "../socket";
 
+/** Config item */
 export default function Config({ name, game }) {
     const options = {
         "starting_cards": {
@@ -12,7 +13,7 @@ export default function Config({ name, game }) {
             type: "number",
             min: 3, max: 12
         },
-        "chat": {
+        "enable_chat": {
             title: "Chat",
             desc: "Enables the chat menu",
 
@@ -47,7 +48,7 @@ export default function Config({ name, game }) {
 
                     {/* Input */}
                     <div className="input_container border_shadowed margin_left_auto">
-                        <Input type={option.type} id={name} min={option.min} max={option.max} initialValue={game.config[name]} updateConfig={updateConfig} disabled={socket.id !== game.host} />
+                        <Input type={option.type} id={name} min={option.min} max={option.max} configValue={game.config[name]} updateConfig={updateConfig} disabled={socket.id !== game.host} />
                     </div>
                 </div>
             </label>
@@ -56,8 +57,9 @@ export default function Config({ name, game }) {
     )
 }
 
-function Input({ type, id, initialValue, min, max, updateConfig, disabled }) {
-    const [value, setValue] = useState(initialValue);
+/** Inputs */
+function Input({ type, id, configValue, min, max, updateConfig, disabled }) {
+    const [localValue, setValue] = useState(configValue);
 
     function set(v) {
         // if(disabled) return;
@@ -75,21 +77,25 @@ function Input({ type, id, initialValue, min, max, updateConfig, disabled }) {
     }
 
     if(type === "number") {
+        const buttonDown = <button className="number_input_btn" onClick={() => set(old => old-1)}>
+            -
+        </button>;
+        const input = <input id={id} type="number" min={min} max={max} value={configValue} onChange={event => set(Number(event.target.value))} disabled />;
+        const buttonUp = <button className="number_input_btn" onClick={() => set(old => old+1)}>
+            +
+        </button>;
+
         return (
             <>
-                <button className="number_input_btn" onClick={() => set(old => old-1)}>
-                    -
-                </button>
-                <input id={id} type="number" min={min} max={max} value={value} onChange={event => set(Number(event.target.value))} />
-                <button className="number_input_btn" onClick={() => set(old => old+1)}>
-                    +
-                </button>
+                {disabled ? null : buttonDown}
+                {input}
+                {disabled ? null : buttonUp}
             </>
         )
     }
     else if(type === "boolean") {
         return (
-            <input type="checkbox" name={id} id={id} checked={initialValue} onClick={() => set(old => !old)} />
+            <input type="checkbox" name={id} id={id} checked={configValue} onClick={() => set(old => !old)} />
         )
     }
 

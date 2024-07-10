@@ -4,6 +4,7 @@
 const express = require("express");
 const app = express();
 const fs = require("fs");
+const http = require("http");
 const https = require("https");
 const { Server } = require("socket.io");
 const data = require('./data.json');
@@ -12,17 +13,24 @@ const data = require('./data.json');
 const cors = require("cors");
 app.use(cors());
 
+// SSL
 const privateKey  = fs.readFileSync('./ssl/server.key', 'utf8');
 const certificate = fs.readFileSync('./ssl/server.cert', 'utf8');
-var credentials = {key: privateKey, cert: certificate};
 
-/** Express server instance */
-const server = https.createServer(credentials, app);
-
+// Environment
 const isProduction = process.env.NODE_ENV === 'production';
 const clientOrigin = isProduction ?
     "https://uno.notkal.com" :  // Production website
-    'https://localhost:3000';    // Development
+    'http://localhost:3000';    // Development
+
+/** Express server instance */
+const server = isProduction ?
+    https.createServer({
+        key: privateKey, cert: certificate
+    }, app) : // Production, SSL
+    http.createServer(app); // Development
+
+
 
 console.log(
 `
@@ -140,7 +148,7 @@ class Uno {
         
             draw_until_match: false,
 
-            chat: true,
+            enable_chat: true,
             xray: false
         }
 
@@ -351,7 +359,7 @@ class Uno {
     drawCard(socketID) {
         const pnum = this.getPnumFromSocketID(this.players, socketID);
 
-        if(this.turn !== pnum) return console.warn(`[Player ${pnum}] Not your turn (Currently player ${game.turn}'s turn)`);
+        if(this.turn !== pnum) return console.warn(`[Player ${pnum}] Not your turn (Currently player ${this.turn}'s turn)`);
 
         // 1 draw limit
         // if(!this.config.draw_until_match && game.draw_count > 0) {
@@ -583,6 +591,10 @@ io.on("connection", (socket) => {
         const game = getGameByUser();
         if(game === undefined || typeof option !== 'string') return;
 
+        if(game.host !== socket.id) return socket.emit("Toast", {
+            msg: "Must be hosting to change game config"
+        })
+
         if(game.config.hasOwnProperty(option)) {
             if(typeof value !== typeof game.config[option]) return;
 
@@ -593,11 +605,13 @@ io.on("connection", (socket) => {
 
     socket.on("drawCard", () => {
         const game = getGameByUser();
+        if(game === undefined) return;
         game.drawCard(socket.id);
     })
 
     socket.on("playCard", cardID => {
         const game = getGameByUser();
+        if(game === undefined) return;
         game.playCard(socket.id, cardID);
     })
 
@@ -605,9 +619,22 @@ io.on("connection", (socket) => {
     socket.on("chat", (data) => {
         if(typeof data.msg !== 'string' || data.msg.length < 1) return;
 
+        // Info
         const roomID = usersRooms[socket.id];
         data.user = allusers[socket.id];
         data.socketID = socket.id;
+
+        const game = getGameByUser();
+        if(game === undefined || !game?.config?.enable_chat) return;
+
+        // Ratelimit
+        // const ratelimit = 100;
+        // if(Date.now() <= (allusers[socket.id]?.last_msg??0) + ratelimit) {
+        //     return socket.emit("toast", {
+        //         msg: "You are being ratelimited"
+        //     })
+        // }
+        // allusers[socket.id].last_msg = Date.now();
 
         // Log
         console.log(`[${roomID}] ${data.user.name}: ${data.msg}`);
@@ -649,5 +676,5 @@ io.on("connection", (socket) => {
 // const port = 3001;
 const port = 8080;
 server.listen(port, () => {
-    console.log(`Listening on port \x1b[36m${port}`);
+    console.log(`Listening on port \x1b[36m${port}\x1b[0m\n`);
 })

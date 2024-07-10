@@ -18,8 +18,8 @@ export default function App() {
 
     // Game
     const [game, setGame] = useState(false);
-    const [profile, setProfile] = useState({ name:"username", avatar:false });
-    const [users, setUsers] = useState({});
+    const [profile, setProfile] = useState({ name:"username", avatar:"balloon" });
+    // const [users, setUsers] = useState({});
 
     /** Emits start_game event */
     function startGame() {

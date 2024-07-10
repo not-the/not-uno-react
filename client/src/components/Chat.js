@@ -26,7 +26,7 @@ export default function Chat({
             </button>
 
             <hr />
-            <br/>
+
             <div className="chat_messages">
                 {
                     // Not in-game
@@ -36,7 +36,7 @@ export default function Chat({
                     </div> :
 
                     // Chat is disabled
-                    !game?.config?.chat ?
+                    !game?.config?.enable_chat ?
                     <div className="chat_unavailable secondary_text">
                         Chat is disabled
                     </div> :
@@ -48,12 +48,12 @@ export default function Chat({
                 }
             </div>
 
-            <div className="chat_bottom" aria-disabled={!game?.config?.chat}>
+            <div className="chat_bottom" aria-disabled={!game?.config?.enable_chat}>
                 <input type="text" name="chat_input" id="chat_input"
                     placeholder="Send a message..."
                     onChange={event => setChatInput(event.target.value)}
                     onKeyDown={event => { if(event.key === "Enter") sendChat() }}
-                    disabled={!game?.config?.chat}
+                    disabled={!game?.config?.enable_chat}
                 />
                 <button
                     onClick={sendChat}

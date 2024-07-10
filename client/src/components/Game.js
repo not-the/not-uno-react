@@ -123,7 +123,7 @@ export default function Game({ game, setGame }) {
 
                 return (
                     <div className={classes} key={playerIndex} style={styles}>
-                        <h2>PLAYER {playerIndex+1}</h2>
+                        <h3 className="border_shadowed">PLAYER {playerIndex+1}</h3>
 
                         {/* Cards */}
                         <div className="inner">

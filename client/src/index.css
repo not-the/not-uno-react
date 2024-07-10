@@ -153,10 +153,10 @@ hr {
 
 
 /* Shorthand */
-.flex {
-    display: flex;
-}
+.flex { display: flex; }
 .flex_important { display: flex !important; }
+.flex_center_vertically { align-items: center; }
+
 .underline {
     border-bottom: 5px solid white;
 }
@@ -321,6 +321,16 @@ button.button_primary:not([disabled]):focus-visible {
 #lobby, #config {
     animation: lobby_in 1s cubic-bezier(0.075, 0.82, 0.165, 1) backwards;
 }
+.player_count {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    border-radius: 100px;
+    padding: 1px 9px;
+}
+.player_count.full {
+    background-color: white;
+    color: black;
+}
 #config {
     animation-delay: 0.1s;
 }
@@ -471,6 +481,9 @@ button.share_button {
     border-radius: 16px;
     background-color: rgba(0, 0, 0, 0.2);
     box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.5);
+}
+.player h3 {
+    margin-bottom: 6px;
 }
 
 /* Compact all cards except current player's */
@@ -889,6 +902,7 @@ button.share_button {
 }
 .chat_messages {
     max-height: min(calc(100vh - 174px), 430px);
+    padding-top: 18px;
     overflow-y: auto;
     display: flex;
     flex-direction: column-reverse;
