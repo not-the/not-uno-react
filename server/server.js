@@ -671,6 +671,17 @@ io.on("connection", (socket) => {
     }
 })
 
+// API site confirmation
+app.get('/', (req, res) => {
+    res.send(`
+    <h1>not uno</h1>
+    <p>
+    Users online: ${Object.keys(allusers).length}<br/>
+    Open lobbies: ${Object.keys(allgames).length}
+    </p>
+    `);
+})
+
 
 // Listen
 // const port = 3001;
