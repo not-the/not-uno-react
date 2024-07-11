@@ -25,11 +25,11 @@ var privateKey, certificate;
 if(isProduction) {
     try {
         privateKey  = fs.readFileSync(
-            '/etc/letsencrypt/live/uno-server1.notkal.com/fullchain.pem',
+            '/etc/letsencrypt/live/uno-server1.notkal.com/privkey.pem',
             'utf8'
         );
         certificate = fs.readFileSync(
-            '/etc/letsencrypt/live/uno-server1.notkal.com/privkey.pem',
+            '/etc/letsencrypt/live/uno-server1.notkal.com/fullchain.pem',
             'utf8'
         );
     } catch (error) {
