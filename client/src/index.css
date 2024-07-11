@@ -906,7 +906,7 @@ button.share_button {
     overflow-y: auto;
     display: flex;
     flex-direction: column-reverse;
-    gap: 9px;
+    gap: 2px;
 }
 .chat_messages > p {
     border-top: 1px solid gray;
@@ -1151,6 +1151,17 @@ body:has(#profile) .backdrop {
     white-space: pre;
     font-weight: 450;
     color: var(--secondary-text);
+}
+
+.user.user_message:not(.clump) {
+    padding-top: 8px;
+}
+.user.clump .name {
+    display: none;
+}
+.user.clump img {
+    opacity: 0;
+    height: 0;
 }
 
 .profile_button {

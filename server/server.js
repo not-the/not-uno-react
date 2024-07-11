@@ -255,7 +255,6 @@ class Uno {
             // Other player's cards
             if(!this.config.xray) {
                 for(const pnum in tailoredGame.players) {
-                    console.log(pnum, tailoredGame.my_num);
                     if(pnum != tailoredGame.my_num) hideAll(tailoredGame.players[pnum].cards, true);
                 }
             }
@@ -357,7 +356,7 @@ class Uno {
 
         // Empty deck
         if(fromName === 'deck' && this.deck.length === 0) {
-            console.log('Shuffling pile back into deck');
+            // console.log('Shuffling pile back into deck');
 
             // Move cards
             this.deck = structuredClone(this.pile.slice(0, -1));
@@ -662,7 +661,6 @@ io.on("connection", (socket) => {
     // Disconnect
     socket.on("disconnect", () => {
         console.log(`Disconnected: ${socket.id}`);
-        console.log(socket.id);
 
         getGameByUser()?.leave(socket);
 

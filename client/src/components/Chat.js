@@ -43,7 +43,7 @@ export default function Chat({
 
                     // Messages
                     chatCache.map((data, index) => <div className="msg" key={index}>
-                        <User user={game.usersParsed[data.socketID]} message={data.msg} />
+                        <User user={game.usersParsed[data.socketID]} message={data.msg} classes={data.clump ? "clump" : undefined} />
                     </div>)
                 }
             </div>

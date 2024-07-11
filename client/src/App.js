@@ -36,7 +36,18 @@ export default function App() {
     const [chatBubble, setChatBubble] = useState(undefined);
     // const [chatBubbleTimeout, setChatBubbleTimeout] = useState(undefined);
     function newChatMsg(data, open) {
-        setChatCache(old => [data, ...old]); // Push new message
+        setChatCache(old => {
+            let newArr = [data, ...old];
+
+            // Clump messages from same user together
+            for(let i in newArr) {
+                const item = newArr[i];
+                const prev = newArr[i - 1];
+                if(item?.socketID === prev?.socketID && prev !== undefined) prev.clump = true;
+            }
+
+            return newArr;
+        }); // Push new message
 
         console.log(open);
 

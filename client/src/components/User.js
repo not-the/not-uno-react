@@ -1,10 +1,13 @@
 // import { socket } from "../socket"
 
-export default function User({ user, game, message, title }) {
+export default function User({ user, game, message, title, classes="" }) {
     // const isMe = user.socketID === socket.id;
 
+    let className = `user${message?" user_message":""}`;
+    className += " " + classes;
+
     return (
-        <div className={`user${message?" user_message":""}`} data-title={title}>
+        <div className={className} data-title={title}>
             {/* Avatar */}
             <img src={`/avatars/${user.avatar}.png`} alt="" />
 
