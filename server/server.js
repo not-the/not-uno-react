@@ -152,9 +152,9 @@ const allusers = {};
 /** Game class */
 class Uno {
     constructor({ roomID, host }) {
-        // Config
+        // Default Config
         this.config = {
-            deck: "normal",
+            starting_deck: "normal",
             starting_cards: 7,
         
             // allow_continues: false, // Offer to continue game with remaining players after someone wins
@@ -291,7 +291,7 @@ class Uno {
         // }
 
         // Setup
-        this.deck = structuredClone(data.decks[this.config.deck]), // Deck you draw from
+        this.deck = structuredClone(data.decks[this.config.starting_deck].cards), // Deck you draw from
         this.pile = []; // Played cards pile
 
         this.turn = 0;
@@ -411,15 +411,24 @@ class Uno {
             console.warn(`[Player ${pnum}] Card #${cardID} doesn't exist`);
             return false;
         };
-        const pileTop = this.pile[this.pile.length-1];
 
-        // Test
+        console.log(playerCard);
+
+        // Pre-move action
+        if(playerCard.choose_color === true) {
+            this.action = "choose_color";
+            this.updateClients();
+            return;
+        }
+
+        // Test discard pile for valid move
+        const pileTop = this.pile[this.pile.length-1];
         if(!testCards(playerCard, pileTop)) {
             console.warn(`[Player ${pnum}] Invalid card`);
             return false;
         }
 
-
+        /** Moves the card and ends turn */
         const endMove = () => {
             // Play card
             this.moveCard(pnum, "pile", false, cardID);

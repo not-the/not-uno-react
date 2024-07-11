@@ -42,12 +42,12 @@ export default function Game({ game, setGame }) {
         socket.emit("playCard", cardID);
     }
 
-    // function runDialogAction(value) {
-    //     console.log(value);
-    //     if(dialogAction) dialogAction(value);
-    //     setDialog(null);
-    //     setDialogAction(null)
-    // }
+    function action(value) {
+        console.log(value);
+        // if(dialogAction) dialogAction(value);
+        // setDialog(null);
+        // setDialogAction(null)
+    }
 
 
     // HTML
@@ -143,18 +143,18 @@ export default function Game({ game, setGame }) {
         </main>
 
         {/* Dialog */}
-        {/* {dialog === 'choose_color' ?
-            <div className="dialog toast">
+        {game.turn === game.my_num && game.action === 'choose_color' ?
+            <div className="dialog">
                 <h3>CHOOSE A COLOR</h3>
                 <div className="choose_color_container">
-                    <div className="red" role="button" tabIndex="0" onClick={runDialogAction("red")} />
-                    <div className="yellow" role="button" tabIndex="0" onClick={runDialogAction("red")} />
-                    <div className="green" role="button" tabIndex="0" onClick={runDialogAction("red")} />
-                    <div className="blue" role="button" tabIndex="0" onClick={runDialogAction("red")} />
+                    <div className="red" role="button" tabIndex="0" onClick={action("red")} />
+                    <div className="yellow" role="button" tabIndex="0" onClick={action("yellow")} />
+                    <div className="green" role="button" tabIndex="0" onClick={action("green")} />
+                    <div className="blue" role="button" tabIndex="0" onClick={action("blue")} />
                 </div>
             </div>
         : null
-        } */}
+        }
         </>
     );
 }

@@ -105,6 +105,10 @@ export default function Lobby({ game, startGame }) {
             {/* Options */}
             <div id="config" className="container">
                 <h3 className="border_shadowed">Options</h3>
+
+                {/* Deck */}
+                <Config name="starting_deck" game={game} />
+
                 {/* Starting cards */}
                 <Config name="starting_cards" game={game} />
 

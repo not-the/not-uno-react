@@ -33,6 +33,11 @@
     --blue: #166aca;
     --black: #000000;
 
+    /* Cards (Extra) */
+    --purple: #7143c7;
+    --orange: #dd7616;
+    --cyan: #00bbab;
+
     /* Misc */
     --container-width: 640px;
     --shadow-color: #181854;
@@ -162,6 +167,7 @@ hr {
 }
 .fullwidth { width: 100%; }
 .cursor_pointer { cursor: pointer; }
+.pointer_events_none { pointer-events: none; }
 .float_right { float: right; }
 .small_text {
     font-size: 20pt !important;
@@ -726,10 +732,17 @@ button.share_button {
     background-color: rgb(255, 181, 181);
     /* border: 2px solid rgb(73, 140, 241); */
 }
+
+/* Colors */
 .red { background-color: var(--red) !important; }
 .yellow { background-color: var(--yellow) !important; }
 .green { background-color: var(--green) !important; }
 .blue { background-color: var(--blue) !important; }
+
+/* Bonus colors */
+.purple { background-color: var(--purple) !important; }
+.orange { background-color: var(--orange) !important; }
+.cyan { background-color: var(--cyan) !important; }
 
 
 /* Card back */
@@ -749,6 +762,10 @@ button.share_button {
 }
 
 
+/* Toasts */
+#toasts {
+    pointer-events: none;
+}
 .toast {
     background-color: rgb(61, 83, 68);
     width: 100%;
@@ -756,6 +773,8 @@ button.share_button {
     border: 3px solid white;
 
     box-shadow: 0 2px 9px rgba(0, 0, 0, 0.6);
+
+    /* pointer-events: all; */
 }
 .toast > .inner {
     padding: 18px 24px;
@@ -1058,8 +1077,13 @@ button.share_button {
     --bg-comp-light: rgb(59, 61, 143);
     --bg-comp-lighter: rgb(100, 102, 216);
 
+    position: fixed;
+
+    bottom: 24px;
+    right: 24px;
+
     width: 100%;
-    max-width: 440px;
+    max-width: 200px;
     padding: 12px 18px;
 
     background-color: var(--bg-comp);

@@ -5,6 +5,14 @@ import { socket } from "../socket";
 /** Config item */
 export default function Config({ name, game }) {
     const options = {
+        "starting_deck": {
+            title: "Deck",
+            desc: "Game version",
+            icon: "/icons/play.svg",
+
+            type: "dropdown",
+            dropdown: ["normal", "all_wilds", "stupid"]
+        },
         "starting_cards": {
             title: "Starting cards",
             desc: "Number of cards each player starts with",
@@ -48,7 +56,13 @@ export default function Config({ name, game }) {
 
                     {/* Input */}
                     <div className="input_container border_shadowed margin_left_auto">
-                        <Input type={option.type} id={name} min={option.min} max={option.max} configValue={game.config[name]} updateConfig={updateConfig} disabled={socket.id !== game.host} />
+                        <Input
+                            option={option}
+                            id={name}
+                            configValue={game.config[name]}
+                            updateConfig={updateConfig}
+                            disabled={socket.id !== game.host}
+                        />
                     </div>
                 </div>
             </label>
@@ -58,10 +72,13 @@ export default function Config({ name, game }) {
 }
 
 /** Inputs */
-function Input({ type, id, configValue, min, max, updateConfig, disabled }) {
+function Input({ id, option, configValue, updateConfig, disabled }) {
     const [localValue, setValue] = useState(configValue);
 
+    const { type, min, max } = option;
+
     function set(v) {
+        console.log(id, v);
         // if(disabled) return;
 
         setValue(old => {
@@ -96,6 +113,16 @@ function Input({ type, id, configValue, min, max, updateConfig, disabled }) {
     else if(type === "boolean") {
         return (
             <input type="checkbox" name={id} id={id} checked={configValue} onClick={() => set(old => !old)} />
+        )
+    }
+
+    else if(type === "dropdown") {
+        return (
+            <select name={id} id={id} onChange={event => set(event.target.value)}>
+                {option.dropdown.map(item => {
+                    return <option value={item}>{item}</option>
+                })}
+            </select>
         )
     }
 

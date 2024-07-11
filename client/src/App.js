@@ -334,12 +334,12 @@ export default function App() {
 
                 {/* Debug tools */}
                 {!isProduction ? <>
-                    <button onClick={debugDataRequest}>Request server data</button>
-                    <div>
+                    <div class="pointer_events_none">
                         <strong>debug:</strong><br/>
                         pnum: {game?.my_num}<br/>
                         socketID: {socket?.id}
                     </div>
+                    {/* <button onClick={debugDataRequest}>Request server data</button> */}
                 </> : null}
             </div>
         </>
