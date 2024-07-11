@@ -24,6 +24,8 @@
     --secondary-text: rgb(202, 211, 221);
     --link: #7ec1ff;
 
+    --accent-blue: #508ddc;
+    --accent-blue-light: #85baff;
     --warm-shadow: rgb(65, 26, 0);
 
     /* Cards */
@@ -262,7 +264,7 @@ button:focus-visible {
     border-radius: 6px;
 
     color: white;
-    background-color: #508ddc;
+    background-color: var(--accent-blue);
 
     transition: filter 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
 }
@@ -319,6 +321,57 @@ button.button_primary:not([disabled]):focus-visible {
 }
 .button_comp {
     background-color: var(--bg-comp-light);
+}
+
+
+/* Toggle switch */
+.toggle {
+    position: relative;
+    display: inline-block;
+    width: 54px;
+    height: 32px;
+    cursor: pointer;
+    user-select: none;
+}
+.toggle[aria-disabled="true"] {
+    opacity: 0.7;
+    cursor: unset;
+}
+.toggle:has(input:focus-visible) { outline: 2px solid white; }
+.toggle > input { opacity:0; width:0; height:0; }
+.toggle > span {
+    position: absolute;
+    top:0; left:0; right:0; bottom:0;
+    background-color: var(--bg-main);
+    border: 2px solid transparent;
+    transition: 0.1s ease-out, border-color 0.6s ease;
+    border-radius: 5px;
+
+    --shadow-color: transparent;
+}
+.toggle > span::before {
+    position: absolute;
+    content: "";
+    z-index: 2;
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--secondary-text);
+    transition: 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+    border-radius: 5px;
+}
+.toggle:not([aria-disabled="true"]):active > span::before {
+    width: 28px;
+}
+.toggle:not([aria-disabled="true"]):active > input:checked + span:before { transform: translateX(15px); }
+.toggle > input:checked + span {
+    border-color: var(--accent-blue-light);
+    background-color: var(--accent-blue);
+}
+.toggle > input:checked + span:before {
+    transform: translateX(21px);
+    background-color: var(--text);
 }
 
 
@@ -386,10 +439,10 @@ button.button_primary:not([disabled]):focus-visible {
 
     height: 45%;
 
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: #4d7e51;
 }
 
-#config > .item .input_container {
+.input_container {
     border-radius: 5px;
     overflow: hidden;
     background-color: var(--bg-main);
@@ -398,19 +451,27 @@ button.button_primary:not([disabled]):focus-visible {
     display: flex;
     gap: 2px;
 }
+.input_container:has(input[type="checkbox"]) { background-color: var(--bg-lighter); }
+
 #config > .item input,
-#config > .item button {
-    min-width: 36px;
+#config > .item button,
+#config > .item select {
+    width: 100%;
+    max-width: 36px;
+
     font-size: 14pt;
+    font-weight: 600;
     text-align: center;
 
     background-color: var(--bg-lighter);
     color: white;
     border: none;
 }
+#config > .item button { min-width: 36px; }
 #config > .item input {
     min-width: 64px;
 }
+#config > .item select { font-size: 13pt; text-align: left; max-width: 140px; }
 
 /* REMOVE INPUT ARROWS */
 /* Chrome, Safari, Edge, Opera */

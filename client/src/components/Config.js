@@ -112,13 +112,16 @@ function Input({ id, option, configValue, updateConfig, disabled }) {
     }
     else if(type === "boolean") {
         return (
-            <input type="checkbox" name={id} id={id} checked={configValue} onClick={() => set(old => !old)} />
+            <div className="toggle" aria-disabled={disabled}>
+                <input type="checkbox" name={id} id={id} checked={configValue} onClick={() => set(old => !old)} disabled={disabled} />
+                <span className="border_shadowed" />
+            </div>
         )
     }
 
     else if(type === "dropdown") {
         return (
-            <select name={id} id={id} onChange={event => set(event.target.value)}>
+            <select name={id} id={id} value={configValue} onChange={event => set(event.target.value)}>
                 {option.dropdown.map(item => {
                     return <option value={item}>{item}</option>
                 })}
