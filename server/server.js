@@ -13,21 +13,31 @@ const data = require('./data.json');
 const cors = require("cors");
 app.use(cors());
 
-// SSL
-const privateKey  = fs.readFileSync(
-    '/etc/letsencrypt/live/uno-server1.notkal.com/fullchain.pem',
-    'utf8'
-);
-const certificate = fs.readFileSync(
-    '/etc/letsencrypt/live/uno-server1.notkal.com/privkey.pem',
-    'utf8'
-);
-
 // Environment
 const isProduction = process.env.NODE_ENV === 'production';
 const clientOrigin = isProduction ?
     "https://uno.notkal.com" :  // Production website
     'http://localhost:3000';    // Development
+
+
+// SSL
+var privateKey, certificate;
+if(isProduction) {
+    try {
+        privateKey  = fs.readFileSync(
+            '/etc/letsencrypt/live/uno-server1.notkal.com/fullchain.pem',
+            'utf8'
+        );
+        certificate = fs.readFileSync(
+            '/etc/letsencrypt/live/uno-server1.notkal.com/privkey.pem',
+            'utf8'
+        );
+    } catch (error) {
+        console.warn("SSL keys not found. Error below:");
+        console.warn(error);
+    }
+}
+
 
 /** Express server instance */
 const server = isProduction ?
