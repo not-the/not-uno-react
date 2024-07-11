@@ -1,9 +1,9 @@
 // import { socket } from "../socket"
 
-export default function User({ user, game, message, title, classes="" }) {
+export default function User({ user, game, tagline, title, classes="" }) {
     // const isMe = user.socketID === socket.id;
 
-    let className = `user${message?" user_message":""}`;
+    let className = `user${tagline?" has_tagline":""}`;
     className += " " + classes;
 
     return (
@@ -18,11 +18,11 @@ export default function User({ user, game, message, title, classes="" }) {
 
             <div>
                 {/* Username */}
-                <span className={`name ${message ? " small_name" : null}`}>
+                <span className={`name ${tagline ? " small_name" : null}`}>
                     {user.name}
                 </span>
 
-                <p className="message">{message}</p>
+                <p className="tagline">{tagline}</p>
             </div>
         </div>
     )

@@ -1115,7 +1115,7 @@ body:has(#profile) .backdrop {
     gap: 12px;
     text-align: left;
 
-    border-radius: 10px;
+    border-radius: 100px;
 
     filter: drop-shadow(2px 2px 3px rgba(5, 8, 37, 0.5));
 }
@@ -1147,19 +1147,20 @@ body:has(#profile) .backdrop {
     transform: rotate(-22deg);
     font-size: 16pt;
 }
-.user .message {
+.user .tagline {
     white-space: pre;
     font-weight: 450;
     color: var(--secondary-text);
 }
 
-.user.user_message:not(.clump) {
-    padding-top: 8px;
+/* User message */
+.user.msg:not(.clump) {
+    margin-top: 8px;
 }
-.user.clump .name {
+.msg.clump .name {
     display: none;
 }
-.user.clump img {
+.msg.clump img {
     opacity: 0;
     height: 0;
 }

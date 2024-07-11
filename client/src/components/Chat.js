@@ -22,7 +22,7 @@ export default function Chat({
 
             {/* Edit profile */}
             <button className="profile_button button_comp fullwidth" onClick={() => setProfileOpen(true)}>
-                <User user={profile} message={"Click to customize..."} />
+                <User user={profile} tagline={"Click to customize..."} />
             </button>
 
             <hr />
@@ -42,9 +42,12 @@ export default function Chat({
                     </div> :
 
                     // Messages
-                    chatCache.map((data, index) => <div className="msg" key={index}>
-                        <User user={game.usersParsed[data.socketID]} message={data.msg} classes={data.clump ? "clump" : undefined} />
-                    </div>)
+                    chatCache.map((data, index) => 
+                        <User
+                            user={game.usersParsed[data.socketID]}
+                            tagline={data.msg}
+                            classes={"msg" + (data.clump ? " clump" : "")} key={index}
+                        />)
                 }
             </div>
 
