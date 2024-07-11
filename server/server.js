@@ -14,8 +14,14 @@ const cors = require("cors");
 app.use(cors());
 
 // SSL
-const privateKey  = fs.readFileSync('./ssl/server.key', 'utf8');
-const certificate = fs.readFileSync('./ssl/server.cert', 'utf8');
+const privateKey  = fs.readFileSync(
+    '/etc/letsencrypt/live/uno-server1.notkal.com/fullchain.pem',
+    'utf8'
+);
+const certificate = fs.readFileSync(
+    '/etc/letsencrypt/live/uno-server1.notkal.com/privkey.pem',
+    'utf8'
+);
 
 // Environment
 const isProduction = process.env.NODE_ENV === 'production';
