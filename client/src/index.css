@@ -16,10 +16,12 @@
     --bg-darker: #1f4928;
     --bg-lighter: #629165;
 
+    /* BG Complementary */
     --bg-comp: rgb(14, 72, 126);
     --bg-comp-light: rgb(19, 83, 143);
     --bg-comp-lighter: rgb(48, 128, 202);
 
+    /* Text */
     --text: white;
     --secondary-text: rgb(202, 211, 221);
     --link: #7ec1ff;
@@ -846,6 +848,20 @@ button.share_button {
     font-size: 13.5pt;
 }
 
+/* Choose color */
+.choose_color {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+
+    width: 100%;
+    max-width: 240px;
+    padding: 12px 18px;
+    
+    background-color: var(--bg-comp);
+    border: 1px solid var(--bg-comp-lighter);
+    border-radius: 5px;
+}
 .choose_color_container {
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -862,16 +878,16 @@ button.share_button {
 
     transition: box-shadow 0.15s ease, transform 0.15s ease, border-width 0.15s ease, filter 0.25s ease;
 }
-.choose_color_container:hover > div,
+/* .choose_color_container:hover > div,
 .choose_color_container:focus-within > div {
     filter: brightness(90%) contrast(90%);
-}
+} */
 .choose_color_container > div:hover,
 .choose_color_container > div:focus-visible {
     transform: scale(1.1);
     border-width: 5px;
-    filter: none;
-    box-shadow: 0 0 9px black, inset 0 0 12px rgba(0, 0, 0, 0.5);
+    /* filter: none; */
+    /* box-shadow: 0 0 9px black, inset 0 0 12px rgba(0, 0, 0, 0.5); */
 
     cursor: pointer;
 }
@@ -1144,8 +1160,11 @@ button.share_button {
     right: 24px;
 
     width: 100%;
-    max-width: 200px;
+    max-width: 440px;
     padding: 12px 18px;
+    height: max-content;
+    max-height: 100vh;
+    overflow-y: auto;
 
     background-color: var(--bg-comp);
     border: 1px solid var(--bg-comp-lighter);

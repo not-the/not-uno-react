@@ -201,11 +201,15 @@ class Uno {
         return users;
     }
 
+    /** Player leave game
+     * @param {*} socket Player's socket
+     * @param {Boolean} sendtoast Whether or not to send out a toast
+     */
     leave(socket, sendtoast) {
         const roomID = this.roomID;
 
         // Remove player from game
-        delete this.players[this.getPnumFromSocketID(this.players, socket.id)];
+        delete this.players[this.getPnumFromSocketID(socket.id)];
 
         // Re-register user as being in room
         delete usersRooms[socket.id];
@@ -250,7 +254,7 @@ class Uno {
             let tailoredGame = structuredClone(clone);
 
             // User ID
-            tailoredGame.my_num = this.getPnumFromSocketID(tailoredGame.players, socketID);
+            tailoredGame.my_num = this.getPnumFromSocketID(socketID, tailoredGame.players);
 
             // Other player's cards
             if(!this.config.xray) {
@@ -267,7 +271,21 @@ class Uno {
         // this.emit("gameState", clone);
     }
 
-    getPnumFromSocketID(players, socketID) {
+    performAction(socket, choice) {
+        if(this.turn !== this.getPnumFromSocketID(socket.id)) return; // Not your turn
+
+        // Chose a color
+        if(this.action === "choose_color") {
+            this.playCard(...this.action_params, this.action, choice, false);
+        }
+
+        // Finish
+        delete this.action;
+        delete this.action_params;
+        this.updateClients();
+    }
+
+    getPnumFromSocketID(socketID, players=this.players) {
         return players.findIndex(p => p?.socketID === socketID);
     }
 
@@ -276,7 +294,9 @@ class Uno {
         io.in(this.roomID).emit(eventName, data);
     }
 
-    /** Starts the game (host only) */
+    /** Starts the game (host only)
+     * @param {*} socket Socket of player who made the request
+     */
     start(socket) {
         // Host
         if(socket.id !== this.host) {
@@ -311,6 +331,7 @@ class Uno {
         this.updateClients();
     }
 
+    /** Runs the addPlayer() method for each connected user */
     generatePlayers() {
         let sockets = this.playersBySocket;
         for(let i = 0; i < sockets.length; i++) {
@@ -318,6 +339,7 @@ class Uno {
         }
     }
 
+    /** Adds a new player to the players array and gives them their cards */
     addPlayer(socketID) {
         this.players.push({
             socketID,
@@ -336,7 +358,6 @@ class Uno {
      * @param {String|Number} toName 
      * @param {Boolean} hidden 
      * @param {Number} fromIndex 
-     * @returns 
      */
     moveCard(fromName, toName, hidden, fromIndex, runUpdateClients=true) {
         // Get to/from locations
@@ -370,9 +391,12 @@ class Uno {
         if(runUpdateClients) this.updateClients();
     }
 
-
+    /** Player draw card
+     * @param {String} socketID Socket ID of the player who made the request
+     * @returns 
+     */
     drawCard(socketID) {
-        const pnum = this.getPnumFromSocketID(this.players, socketID);
+        const pnum = this.getPnumFromSocketID(socketID);
 
         if(this.turn !== pnum) return // console.warn(`[Player ${pnum}] Not your turn (Currently player ${this.turn}'s turn)`);
 
@@ -396,9 +420,15 @@ class Uno {
         this.draw_count++;
     }
 
-    playCard(socketID, cardID) {
+    /** Player play card (attempt to put into discard pile)
+     * @param {String} socketID 
+     * @param {Number} cardID 
+     * @param {String} action 
+     * @returns {Boolean} If the move was unsuccessful, whether it not be the player's turn or the move is invalid, the method will return false
+     */
+    playCard(socketID, cardID, actionName, actionChoice, updateClients=true) {
 
-        const pnum = this.getPnumFromSocketID(this.players, socketID);
+        const pnum = this.getPnumFromSocketID(socketID);
 
         if(this.turn !== pnum) {
             // console.warn(`[Player ${pnum}] Not your turn`);
@@ -412,16 +442,16 @@ class Uno {
             return false;
         };
 
-        // Pre-move action
-        if(playerCard.choose_color === true) {
+        // Pre-move action prompt
+        if(playerCard.choose_color === true && actionChoice === undefined) {
             this.action = "choose_color";
+            this.action_params = [socketID, cardID];
             this.updateClients();
             return;
         }
 
         // Test discard pile for valid move
-        const pileTop = this.pile[this.pile.length-1];
-        if(!testCards(playerCard, pileTop)) {
+        if(!testCards(playerCard, this.piletop)) {
             // console.warn(`[Player ${pnum}] Invalid card`);
             return false;
         }
@@ -431,17 +461,23 @@ class Uno {
             // Play card
             this.moveCard(pnum, "pile", false, cardID);
 
+            // Enact Action
+            if(actionChoice !== undefined) {
+                // Chose a color
+                if(actionName === "choose_color") this.piletop.color = actionChoice;
+            }
+
             // Prep for next turn
             if(playerCard.reverse) this.direction *= -1;
             this.nextTurn(playerCard.skip, this);
 
             // Next player
             const nextPlayerID = this.turn;
-            if(playerCard.draw) repeat(() => this.moveCard("deck", nextPlayerID, false), playerCard.draw);
+            if(playerCard.draw) repeat(() => this.moveCard("deck", nextPlayerID, false, undefined, false), playerCard.draw);
 
             // Update state
             // setGame(modifiedGame);
-            this.updateClients();
+            if(updateClients) this.updateClients();
         }
 
 
@@ -457,6 +493,8 @@ class Uno {
         // else
         endMove();
     }
+
+    get piletop() { return this.pile[this.pile.length-1]; }
 
 
     nextTurn(skip=0) {
@@ -497,6 +535,13 @@ io.on("connection", (socket) => {
     socket.on("leave", () => {
         getGameByUser()?.leave(socket, true);
         socket.emit("gameState", false);
+    });
+
+    socket.on("action", data => {
+        const game = getGameByUser();
+        if(game === undefined || data === undefined) return;
+
+        game.performAction(socket, data);
     });
     
     // Set user profile
