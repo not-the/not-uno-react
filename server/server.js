@@ -224,7 +224,7 @@ class Uno {
 
         // All players have left
         if(this.players.length === 0) {
-            console.log(`Room [${roomID}] is empty, closing game...`);
+            // console.log(`Room [${roomID}] is empty, closing game...`);
             delete allgames[roomID]; // Delete self
         }
 
@@ -350,7 +350,7 @@ class Uno {
         // Take card
         let card = fromIndex === undefined ? from.shift() : from.splice(fromIndex, 1)[0];
 
-        if(card === undefined) return console.warn('Card is undefined'); // Error
+        if(card === undefined) return; // Error
         if(hidden !== undefined) card.hidden = hidden; // Unhide
         to.push(card); // Move
 
@@ -374,7 +374,7 @@ class Uno {
     drawCard(socketID) {
         const pnum = this.getPnumFromSocketID(this.players, socketID);
 
-        if(this.turn !== pnum) return console.warn(`[Player ${pnum}] Not your turn (Currently player ${this.turn}'s turn)`);
+        if(this.turn !== pnum) return // console.warn(`[Player ${pnum}] Not your turn (Currently player ${this.turn}'s turn)`);
 
         // 1 draw limit
         // if(!this.config.draw_until_match && game.draw_count > 0) {
@@ -401,18 +401,16 @@ class Uno {
         const pnum = this.getPnumFromSocketID(this.players, socketID);
 
         if(this.turn !== pnum) {
-            console.warn(`[Player ${pnum}] Not your turn`);
+            // console.warn(`[Player ${pnum}] Not your turn`);
             return false;
         };
 
         // Cards
         const playerCard = this.players[pnum].cards[cardID];
         if(playerCard === undefined) {
-            console.warn(`[Player ${pnum}] Card #${cardID} doesn't exist`);
+            // console.warn(`[Player ${pnum}] Card #${cardID} doesn't exist`);
             return false;
         };
-
-        console.log(playerCard);
 
         // Pre-move action
         if(playerCard.choose_color === true) {
@@ -424,7 +422,7 @@ class Uno {
         // Test discard pile for valid move
         const pileTop = this.pile[this.pile.length-1];
         if(!testCards(playerCard, pileTop)) {
-            console.warn(`[Player ${pnum}] Invalid card`);
+            // console.warn(`[Player ${pnum}] Invalid card`);
             return false;
         }
 
