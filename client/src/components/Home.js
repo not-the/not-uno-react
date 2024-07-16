@@ -21,7 +21,7 @@ export default function Home({ joinRoom }) {
         requestLobbies();
 
         // Recieve lobbies
-        socket.on("lobby_list", list => setLobbies(list));
+        socket.on("lobby_list", list => setLobbies(list.length !== 0 ? list : false));
 
         // Unmount
         return () => {
@@ -52,7 +52,12 @@ export default function Home({ joinRoom }) {
 
                     {/* List */}
                     <div className="lobbies_list">
-                        {!lobbies ? null : lobbies.map(lobby => {
+                        {!lobbies ?
+                        <p className="center secondary_text">
+                            No public lobbies open
+                        </p>
+                            :
+                        lobbies.map(lobby => {
                             let modeInfo = capitalizeFirstLetter(lobby?.config?.starting_deck);
 
                             if(lobby?.config?.xray) {
