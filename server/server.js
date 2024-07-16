@@ -17,7 +17,7 @@ app.use(cors());
 const isProduction = process.env.NODE_ENV === 'production';
 const clientOrigin = isProduction ?
     "https://uno.notkal.com" :  // Production website
-    'http://localhost:3000';    // Development
+    'http://10.0.0.29:3000';    // Development
 
 
 // SSL
@@ -65,8 +65,9 @@ const io = new Server(server, {
 });
 
 /** Creates a URL-safe base64 encoded UUID */
-function getRoomUUID(uuid=crypto.randomUUID()) {
+function getRoomUUID() {
     // Convert
+    let uuid = crypto.randomUUID();
     let result = Buffer.from(uuid.replace(/-/g, ''), 'hex').toString('base64url');
 
     // Reduce in length (This increases the odds of duplicate UUIDs being produced, but since we're not dealing with sensitive data it's unique enough)
@@ -151,7 +152,7 @@ const allusers = {};
 
 /** Game class */
 class Uno {
-    constructor({ roomID, host }) {
+    constructor({ roomID, host, nameIsUUID }) {
         // Default Config
         this.config = {
             starting_deck: "normal",
@@ -164,6 +165,7 @@ class Uno {
         
             draw_until_match: false,
 
+            public_lobby: false,
             enable_chat: true,
             xray: false
         }
@@ -171,6 +173,7 @@ class Uno {
         // Data
         this.roomID = roomID;
         this.host = host;
+        this.nameIsUUID = nameIsUUID; // Will be true unless the UUID was player-chosen
 
         // Player-specific
         this.my_num = 0;
@@ -238,13 +241,20 @@ class Uno {
         this.updateClients();
     }
 
-    /** Send game state to clients */
-    updateClients() {
+    /** Creates a structuredClone of the game, obfuscates the deck, and creates a usersParsed property */
+    publicClone() {
         let clone = structuredClone(this);
 
         // Flatten data
         clone.usersParsed = this.users; // User list
         hideAll(clone.deck, true); // Obfuscate deck
+
+        return clone;
+    }
+
+    /** Send game state to clients */
+    updateClients() {
+        let clone = this.publicClone();
 
         // Tailor data for each user
         // Cards that aren't visible to users are stripped of their
@@ -269,6 +279,26 @@ class Uno {
         
         // Emit raw data
         // this.emit("gameState", clone);
+    }
+
+    setConfigOption(socket, option, value) {
+        if(this.host !== socket.id) return socket.emit("Toast", {
+            msg: "Must be hosting to change game config"
+        })
+
+        if(!this.config.hasOwnProperty(option)) return; // Config property doesn't exist
+        if(typeof value !== typeof this.config[option]) return; // New value doesn't match existing type
+
+        // Set
+        this.config[option] = value;
+
+        // Special cases
+        if(option === "public_lobby" && value === true) {
+            this.config.enable_chat = false;
+        }
+
+        // Update
+        this.updateClients();
     }
 
     performAction(socket, choice) {
@@ -528,8 +558,15 @@ io.on("connection", (socket) => {
 
     // Join
     socket.on("join", data => {
-        const roomID = data ?? getRoomUUID();
-        joinRoom(roomID);
+        console.log(data);
+
+        let roomID = structuredClone(data);
+        let needsRandom = (!roomID);
+        if(needsRandom) roomID = getRoomUUID();
+
+        console.log(roomID, needsRandom);
+
+        joinRoom(roomID, needsRandom);
     })
 
     socket.on("leave", () => {
@@ -584,7 +621,7 @@ io.on("connection", (socket) => {
     }
 
     // Join room handler
-    function joinRoom(roomID) {
+    function joinRoom(roomID, nameIsUUID) {
         // ID is not a string or too long
         if(typeof roomID !== 'string' || roomID.length < 4 || roomID.length > 32) {
             console.warn(`Failed trying to join room: User ID ${socket.id}`);
@@ -601,12 +638,14 @@ io.on("connection", (socket) => {
         if(game === undefined) {
             game = new Uno({
                 roomID,
-                host: socket.id
+                host: socket.id,
+                nameIsUUID
             });
             toastTitle = "Created lobby";
         }
         // Game exists and is already started
         else if(game.state !== "lobby") {
+            socket.emit("join_failed");
             socket.emit("toast", {
                 title: "Can't join",
                 msg: `Game has already started (room ID: ${roomID})`
@@ -658,16 +697,7 @@ io.on("connection", (socket) => {
         const game = getGameByUser();
         if(game === undefined || typeof option !== 'string') return;
 
-        if(game.host !== socket.id) return socket.emit("Toast", {
-            msg: "Must be hosting to change game config"
-        })
-
-        if(game.config.hasOwnProperty(option)) {
-            if(typeof value !== typeof game.config[option]) return;
-
-            game.config[option] = value;
-            game.updateClients();
-        }
+        game.setConfigOption(socket, option, value);
     })
 
     socket.on("drawCard", () => {
@@ -709,6 +739,15 @@ io.on("connection", (socket) => {
         // Broadcast
         io.to(roomID).emit("chat_receive", data);
     });
+
+    // Public lobby list
+    socket.on("request_public_lobbies", () => {
+        const publicLobbies =
+            Object.values(allgames)
+                .filter(game => game?.config?.public_lobby === true)
+                .map(game => game.publicClone());
+        socket.emit("lobby_list", publicLobbies);
+    })
 
     // Disconnect
     socket.on("disconnect", () => {

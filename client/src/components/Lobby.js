@@ -106,6 +106,9 @@ export default function Lobby({ game, startGame }) {
             <div id="config" className="container">
                 <h3 className="border_shadowed">Options</h3>
 
+                {/* Chat */}
+                <Config name="public_lobby" game={game} />
+
                 {/* Deck */}
                 <Config name="starting_deck" game={game} />
 

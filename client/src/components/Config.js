@@ -21,12 +21,23 @@ export default function Config({ name, game }) {
             type: "number",
             min: 3, max: 12
         },
+
+        "public_lobby": {
+            title: "Public",
+            desc: "Makes your lobby public",
+
+            icon: "/icons/chat.svg",
+            type: "boolean"
+        },
         "enable_chat": {
             title: "Chat",
             desc: "Enables the chat menu",
 
             icon: "/icons/chat.svg",
-            type: "boolean"
+            type: "boolean",
+
+            condition: () => game?.config?.public_lobby,
+            condition_reason: "Disabled for public games"
         },
         "xray": {
             title: "Hands Down",
@@ -38,19 +49,23 @@ export default function Config({ name, game }) {
     }
 
     const option = options[name];
+    const condition = option?.condition?.();
 
     function updateConfig(option, value) {
         socket.emit("update_config", { option, value });
     }
 
     return (
-        <div className="item border_shadowed">
+        <div className="item border_shadowed" aria-disabled={condition ? "true" : "false"}>
             <img src={option.icon} alt="" className="border_shadowed" />
             <label htmlFor={name}>
                 <div className="inner media_flex">
                     {/* About */}
                     <div>
-                        <h4 className="border_shadowed">{option.title}</h4>
+                        <h4 className="border_shadowed">
+                            {option.title}
+                            {condition ? <span className="small">({option.condition_reason})</span> : null}
+                        </h4>
                         <p className="desc">{option.desc}</p>
                     </div>
 

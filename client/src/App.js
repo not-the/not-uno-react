@@ -88,11 +88,10 @@ export default function App() {
         socket.emit("setUser", { name, avatar });
     }
 
-    const joinRoom = () => {
-        // Join room from URL
-        let urlRoom = window.location.hash.substring(1);
-        if(urlRoom === '') urlRoom = undefined;
-        socket.emit("join", urlRoom);
+    function joinRoom(roomID) {
+        if(roomID === '') roomID = undefined;
+
+        socket.emit("join", roomID);
         setMenu("joining");
     }
 
@@ -141,7 +140,7 @@ export default function App() {
     // Server communication
     useEffect(() => {
         // Auto join from URL
-        if(window.location.hash !== '') joinRoom();
+        if(window.location.hash !== '') joinRoom(window.location.hash.substring(1));
 
         // Pre-existing username
         let myUser = store("user_data") ?? { name: randomName() };
@@ -163,6 +162,12 @@ export default function App() {
 
             if(window.location.hash === '') window.location.hash = `#${roomID}`;
         });
+
+        // Join failed
+        socket.on("join_failed", () => {
+            setMenu("home");
+            window.location.hash = '';
+        })
 
         // Toast notification
         socket.on("toast", (data) => {
@@ -211,6 +216,7 @@ export default function App() {
         return () => {
             socket.off("chat_receive");
             socket.off("join");
+            socket.off("join_failed");
             socket.off("toast");
             socket.off("gameState");
             socket.off("assignedUserData");
@@ -221,10 +227,20 @@ export default function App() {
 
     return (
         <>
-            {/* Logo */}
+            {/* Header */}
             {menu !== "game" ?
-                <h1 className="container"><img src="/LOGO@2x.png" alt="NOT UNO" id="main_logo" /></h1> :
-                null
+                <header className="container flex">
+                    {/* Logo */}
+                    <h1><img src="/LOGO@2x.png" alt="NOT UNO" id="main_logo" /></h1>
+
+                    {/* Footer */}
+                    {/* <footer id="footer_main" className="margin_left_auto">
+                        <div className="inner">
+                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minus, excepturi? Corporis soluta aspernatur, deserunt nesciunt et blanditiis unde obcaecati temporibus?
+                        </div>
+                    </footer> */}
+                </header>
+                : null
             }
 
             {/* Main Content (Home/Lobby/Game/etc.) */}
@@ -334,7 +350,7 @@ export default function App() {
 
                 {/* Debug tools */}
                 {!isProduction ? <>
-                    <div class="pointer_events_none">
+                    <div className="pointer_events_none">
                         <strong>debug:</strong><br/>
                         pnum: {game?.my_num}<br/>
                         socketID: {socket?.id}
