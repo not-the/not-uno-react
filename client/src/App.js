@@ -9,6 +9,7 @@ import { store, arrRandom, capitalizeFirstLetter } from './Util.js'
 
 // Socket.io
 import { socket, isProduction } from './socket.js'
+import Header from './components/Header.js'
 
 // Game
 const clientData = require('./clientData.json');
@@ -229,17 +230,7 @@ export default function App() {
         <>
             {/* Header */}
             {menu !== "game" ?
-                <header className="container flex">
-                    {/* Logo */}
-                    <h1><img src="/LOGO@2x.png" alt="NOT UNO" id="main_logo" /></h1>
-
-                    {/* Footer */}
-                    {/* <footer id="footer_main" className="margin_left_auto">
-                        <div className="inner">
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minus, excepturi? Corporis soluta aspernatur, deserunt nesciunt et blanditiis unde obcaecati temporibus?
-                        </div>
-                    </footer> */}
-                </header>
+                <Header />
                 : null
             }
 

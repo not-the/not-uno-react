@@ -93,14 +93,6 @@ export default function Home({ joinRoom }) {
                     </div>
                 </div>
             </main>
-
-            {/* Footer */}
-            <footer id="footer_main" className="container">
-                <div className="inner">
-                    <strong>Credits:</strong><br/>
-                    <a href="https://notkal.com" target="_blank" rel="noreferrer">notkal.com</a>
-                </div>
-            </footer>
         </>
     )
 }

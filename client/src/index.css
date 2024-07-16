@@ -1340,6 +1340,9 @@ body:has(#profile) .backdrop {
 
 
 /* Footer */
+#footer_main {
+    margin-left: auto;
+}
 #footer_main > .inner {
     border: 5px solid var(--bg-lighter);
     border-radius: 10px;
@@ -1379,5 +1382,8 @@ body:has(#profile) .backdrop {
 @media only screen and (max-width: 640px) {
     .media_flex {
         flex-direction: column;
+    }
+    #footer_main {
+        margin-left: initial;
     }
 }
