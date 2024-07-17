@@ -3,7 +3,7 @@ import { useState } from "react";
 import { socket } from "../socket";
 
 /** Config item */
-export default function Config({ name, game }) {
+export default function Config({ name, game, disabled }) {
     const options = {
         "starting_deck": {
             title: "Deck",
@@ -21,12 +21,28 @@ export default function Config({ name, game }) {
             type: "number",
             min: 3, max: 12
         },
+        "draw_stacking": {
+            title: "Draw Stacking",
+            desc: "Playing a +2 or +4 card allows you to avoid drawing cards yourself",
+            icon: "/icons/Draw stacking.svg",
+
+            type: "dropdown",
+            dropdown: ["no", "same_value", "yes"],
+            dropdown_english: ["No", "Same value cards stack", "Yes"]
+        },
+        "continue": {
+            title: "Everyone's a Winner",
+            desc: "Continue the game after a winner is decided",
+            icon: "/icons/Continue.svg",
+
+            type: "boolean"
+        },
 
         "public_lobby": {
             title: "Public",
             desc: "Makes your lobby public",
 
-            icon: "/icons/chat.svg",
+            icon: "/icons/Door.svg",
             type: "boolean"
         },
         "enable_chat": {
@@ -49,7 +65,8 @@ export default function Config({ name, game }) {
     }
 
     const option = options[name];
-    const condition = option?.condition?.();
+    const condition = disabled || option?.condition?.();
+    const disabled_reason = option.condition_reason ?? "Not implemented";
 
     function updateConfig(option, value) {
         socket.emit("update_config", { option, value });
@@ -64,7 +81,7 @@ export default function Config({ name, game }) {
                     <div>
                         <h4 className="border_shadowed">
                             {option.title}
-                            {condition ? <span className="small">({option.condition_reason})</span> : null}
+                            {condition ? <span className="small">({disabled_reason})</span> : null}
                         </h4>
                         <p className="desc">{option.desc}</p>
                     </div>
@@ -76,7 +93,7 @@ export default function Config({ name, game }) {
                             id={name}
                             configValue={game.config[name]}
                             updateConfig={updateConfig}
-                            disabled={socket.id !== game.host}
+                            disabled={disabled || (socket.id !== game.host)}
                         />
                     </div>
                 </div>
@@ -136,9 +153,9 @@ function Input({ id, option, configValue, updateConfig, disabled }) {
 
     else if(type === "dropdown") {
         return (
-            <select name={id} id={id} value={configValue} onChange={event => set(event.target.value)}>
-                {option.dropdown.map(item => {
-                    return <option value={item}>{item}</option>
+            <select name={id} id={id} value={configValue} onChange={event => set(event.target.value)} disabled={disabled}>
+                {option.dropdown.map((item, index) => {
+                    return <option value={item}>{option?.dropdown_english?.[index] ?? item}</option>
                 })}
             </select>
         )

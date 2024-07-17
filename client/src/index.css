@@ -98,6 +98,25 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 12px;
     --shadow-color: rgba(0, 0, 0, 0.5);
 }
+.fancy_title {
+    position: relative;
+}
+.fancy_title > span {
+    background-color: #406836;
+    padding: 3px 12px;
+    border-radius: 5px;
+}
+.fancy_title::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    top: 0.5lh;
+    z-index: -1;
+
+    background-color: var(--bg-lighter);
+    height: 3px;
+    border-radius: 50px;
+}
 h2 {
     font-size: 30pt;
     /* border-bottom: 5px solid var(--text); */
@@ -203,6 +222,9 @@ hr {
 }
 .gap_12px {
     gap: 12px;
+}
+section {
+    margin-bottom: 36px;
 }
 
 .border_shadowed,
@@ -452,7 +474,7 @@ button.button_primary:not([disabled]):focus-visible {
 #config {
     padding-bottom: 200px;
 }
-#config > .item {
+#config .item {
     --bg-comp: var(--bg-lighter);
     --shadow-color: rgba(0, 0, 0, 0.5);
 
@@ -463,36 +485,37 @@ button.button_primary:not([disabled]):focus-visible {
     margin-top: 24px;
 
     position: relative;
+    cursor: pointer;
 }
-#config > .item[aria-disabled="true"] {
+#config .item[aria-disabled="true"] {
     opacity: 0.5;
     color: var(--secondary-text);
     pointer-events: none;
 }
 
-/* #config > .item label {
+#config .item label {
     cursor: pointer;
-} */
-#config > .item img {
+}
+#config .item img {
     position: absolute;
     top: -14px;
     left: 24px;
 
     width: 40px;
 }
-#config > .item h4 {
+#config .item h4 {
     margin-bottom: 9px;
 }
-#config > .item .inner {
+#config .item .inner {
     display: flex;
     align-items: center;
 }
-#config > .item .desc {
+#config .item .desc {
     color: var(--secondary-text);
     font-size: 11pt;
     margin-left: -56px;
 }
-#config > .item .decorator {
+#config .item .decorator {
     position: absolute;
     inset: 0; top: unset;
     z-index: -1;
@@ -513,9 +536,9 @@ button.button_primary:not([disabled]):focus-visible {
 }
 .input_container:has(input[type="checkbox"]) { background-color: var(--bg-lighter); }
 
-#config > .item input,
-#config > .item button,
-#config > .item select {
+#config .item input,
+#config .item button,
+#config .item select {
     width: 100%;
     max-width: 36px;
 
@@ -527,21 +550,21 @@ button.button_primary:not([disabled]):focus-visible {
     color: white;
     border: none;
 }
-#config > .item button { min-width: 36px; }
-#config > .item input {
+#config .item button { min-width: 36px; }
+#config .item input {
     min-width: 64px;
 }
-#config > .item select { font-size: 13pt; text-align: left; max-width: 140px; }
+#config .item select { font-size: 13pt; text-align: left; max-width: 140px; }
 
 /* REMOVE INPUT ARROWS */
 /* Chrome, Safari, Edge, Opera */
-#config > .item input::-webkit-outer-spin-button,
-#config > .item input::-webkit-inner-spin-button {
+#config .item input::-webkit-outer-spin-button,
+#config .item input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 /* Firefox */
-#config > .item input[type=number] {
+#config .item input[type=number] {
   -moz-appearance: textfield;
 }
 

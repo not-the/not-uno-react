@@ -164,6 +164,7 @@ class Uno {
             // call_penalty_draw_amount: 2,
         
             draw_until_match: false,
+            draw_stacking: "off",
 
             public_lobby: false,
             enable_chat: true,

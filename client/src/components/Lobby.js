@@ -104,22 +104,33 @@ export default function Lobby({ game, startGame }) {
 
             {/* Options */}
             <div id="config" className="container">
-                <h3 className="border_shadowed">Options</h3>
+                {/* Lobby */}
+                <section>
+                    <h4 className="center fancy_title">
+                        <span>Game Config</span>
+                    </h4>
+                    <Config name="public_lobby" game={game} />
+                    <Config name="enable_chat" game={game} />
+                </section>
 
-                {/* Chat */}
-                <Config name="public_lobby" game={game} />
+                {/* Game */}
+                <section>
+                    <h4 className="center fancy_title">
+                        <span>Modifiers</span>
+                    </h4>
+                    <Config name="starting_deck" game={game} />
+                    <Config name="starting_cards" game={game} />
+                </section>
 
-                {/* Deck */}
-                <Config name="starting_deck" game={game} />
-
-                {/* Starting cards */}
-                <Config name="starting_cards" game={game} />
-
-                {/* Hands down */}
-                <Config name="xray" game={game} />
-
-                {/* Chat */}
-                <Config name="enable_chat" game={game} />
+                {/* Special Rules */}
+                <section>
+                    <h4 className="center fancy_title">
+                        <span>Special Rules</span>
+                    </h4>
+                    <Config name="draw_stacking" game={game} disabled={true} />
+                    <Config name="xray" game={game} />
+                    <Config name="continue" game={game} disabled={true} />
+                </section>
             </div>
         </>
     )
