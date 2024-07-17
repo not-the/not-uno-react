@@ -17,7 +17,7 @@ app.use(cors());
 const isProduction = process.env.NODE_ENV === 'production';
 const clientOrigin = isProduction ?
     "https://uno.notkal.com" :  // Production website
-    'http://10.0.0.29:3000';    // Development
+    'http://localhost:3000';    // Development
 
 
 // SSL
@@ -306,13 +306,8 @@ class Uno {
 
         // Chose a color
         if(this.action === "choose_color") {
-            this.playCard(...this.action_params, this.action, choice, false);
+            this.playCard(...this.action_params, this.action, choice);
         }
-
-        // Finish
-        delete this.action;
-        delete this.action_params;
-        this.updateClients();
     }
 
     getPnumFromSocketID(socketID, players=this.players) {
@@ -496,6 +491,10 @@ class Uno {
                 // Chose a color
                 if(actionName === "choose_color") this.piletop.color = actionChoice;
             }
+
+            // End action prompt
+            delete this.action;
+            delete this.action_params;
 
             // Prep for next turn
             if(playerCard.reverse) this.direction *= -1;

@@ -12,8 +12,8 @@ export default function Lobby({ game, startGame }) {
     function shareRoom() {
         // URL PLACEHOLDER
         window.navigator.share({
-            url: `https://localhost:3000/#${game.roomID}`,
-            text: "Play Not UNO with me!"
+            url: `${window.location.origin}/#${game.roomID}`,
+            text: "Play NOT UNO with me!"
         });
     }
 

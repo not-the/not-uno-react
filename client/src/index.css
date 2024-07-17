@@ -64,6 +64,12 @@ body {
 
     background-color: var(--bg-main);
     background: radial-gradient(closest-corner, var(--bg-main) 60%, var(--bg-darker) 100%);
+    background-size: 100%;
+
+    /* The transform fixes chrome lag with background-attachment: fixed. No idea why */
+    background-attachment: fixed;
+    transform:translatez(0);
+    -webkit-transform:translatez(0);
 
 
     /* background-size: cover;
@@ -455,6 +461,8 @@ button.button_primary:not([disabled]):focus-visible {
     border-radius: 5px;
     padding: 5px 24px 5px 80px;
     margin-top: 24px;
+
+    position: relative;
 }
 #config > .item[aria-disabled="true"] {
     opacity: 0.5;
